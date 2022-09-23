@@ -162,7 +162,7 @@ $functions = new functions;
 //
 // Check slashes and trim get, post and cookie variables
 //
-$magic_quotes = get_magic_quotes_gpc();
+$magic_quotes = ini_get('magic_quotes_gpc');
 array_walk($_GET, 'usebb_clean_input_value', $magic_quotes);
 array_walk($_POST, 'usebb_clean_input_value', $magic_quotes);
 array_walk($_COOKIE, 'usebb_clean_input_value', $magic_quotes);

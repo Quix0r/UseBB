@@ -89,7 +89,7 @@ class template {
 	 * Activates gzip compression if needed, before doing a session_start(). 
 	 * Also activates a second output buffer to trigger unwanted output from mods.
 	 */
-	function template() {
+	function __construct() {
 		
 		global $functions;
 		
