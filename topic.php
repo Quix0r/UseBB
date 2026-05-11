@@ -451,7 +451,7 @@ if ( ( !empty($_GET['id']) && valid_int($_GET['id']) ) || ( !empty($_GET['post']
 					'post_anchor' => '<a href="'.$functions->make_url('topic.php', array('post' => $postsdata['id'])).'#post'.$postsdata['id'].'" name="post'.$postsdata['id'].'" rel="nofollow">#'.$i.'</a>'.$new_post_anchor,
 					'post_date' => $functions->make_date($postsdata['post_time']),
 					'post_links' => $post_links,
-					'post_content' => $functions->markup($functions->replace_badwords(stripslashes($postsdata['content'])), $postsdata['enable_bbcode'], $postsdata['enable_smilies'], $postsdata['enable_html'], NULL, $can_post_links),
+					'post_content' => $functions->markup($functions->replace_badwords(stripslashes($postsdata['content'])), $postsdata['enable_bbcode'], $postsdata['enable_smilies'], $postsdata['enable_html'], false, $can_post_links),
 					'poster_sig' => ( !$functions->get_config('hide_signatures') && !empty($postsdata['signature']) && $postsdata['enable_sig'] ) ? sprintf($template->get_config('sig_format'), $functions->markup($functions->replace_badwords(stripslashes($postsdata['signature'])), $functions->get_config('sig_allow_bbcode'), $functions->get_config('sig_allow_smilies'), NULL, NULL, $can_add_profile_links)) : '',
 					'post_editinfo' => $post_editinfo,
 					'poster_ip_addr' => ( !empty($postsdata['poster_ip_addr']) && $functions->get_user_level() == LEVEL_ADMIN ) ? sprintf($template->get_config('poster_ip_addr_format'), sprintf($lang['ViewingIP'], '<a href="'.$functions->make_url('admin.php', array('act' => 'iplookup', 'ip' => $postsdata['poster_ip_addr'])).'">'.$postsdata['poster_ip_addr'].'</a>')) : '',

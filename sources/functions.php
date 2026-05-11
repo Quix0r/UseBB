@@ -2155,7 +2155,7 @@ class functions {
 	 * @param bool $links Enable links parsing
 	 * @return string HTML
 	 */
-	function markup($string, $bbcode=true, $smilies=true, $html=false, $rss_mode=false, $links=true) {
+	function markup(string $string, bool $bbcode=true, bool $smilies=true, bool $html=false, bool $rss_mode=false, bool $links=true): string {
 		
 		global $db, $template, $lang;
 		static $random;
