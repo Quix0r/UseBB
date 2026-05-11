@@ -97,5 +97,3 @@ if ( defined('RUN_MODULE') ) {
 	$usebb_module = new usebb_module;
 	
 }
-
-?>

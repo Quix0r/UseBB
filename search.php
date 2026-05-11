@@ -536,5 +536,3 @@ if ( $functions->get_user_level() < $functions->get_config('view_search_min_leve
 // Include the page footer
 //
 require(ROOT_PATH.'sources/page_foot.php');
-
-?>

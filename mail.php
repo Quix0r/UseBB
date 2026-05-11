@@ -268,5 +268,3 @@ if ( $mail_user || ( $functions->get_config('enable_contactadmin') && $functions
 	$functions->redirect('index.php');
 	
 }
-
-?>

@@ -61,7 +61,7 @@ class session {
 	/**
 	 * @var array Array containing all session info, as well as user info. update() must be called before this contains information.
 	 */
-	var $sess_info = array();
+	var $sess_info = [];
 
 	/**
 	 * Start or continue a session
@@ -107,14 +107,14 @@ class session {
 		// Several session info we maintain
 		//
 		$_SESSION['previous_visit'] = ( !empty($_SESSION['previous_visit']) ) ? $_SESSION['previous_visit'] : 0;
-		$_SESSION['viewed_topics'] = ( isset($_SESSION['viewed_topics']) && is_array($_SESSION['viewed_topics']) ) ? $_SESSION['viewed_topics'] : array();
+		$_SESSION['viewed_topics'] = ( isset($_SESSION['viewed_topics']) && is_array($_SESSION['viewed_topics']) ) ? $_SESSION['viewed_topics'] : [];
 		$_SESSION['latest_post'] = ( !empty($_SESSION['latest_post']) ) ? $_SESSION['latest_post'] : 0;
 		$_SESSION['dnsbl_checked'] = ( !empty($_SESSION['dnsbl_checked']) ) ? $_SESSION['dnsbl_checked'] : 0;
 		$_SESSION['dnsbl_whitelisted'] = ( isset($_SESSION['dnsbl_whitelisted']) && $_SESSION['dnsbl_whitelisted'] );
 		$_SESSION['antispam_question_posed'] = ( isset($_SESSION['antispam_question_posed']) && $_SESSION['antispam_question_posed'] );
-		$_SESSION['tokens'] = ( isset($_SESSION['tokens']) && is_array($_SESSION['tokens']) ) ? $_SESSION['tokens'] : array();
+		$_SESSION['tokens'] = ( isset($_SESSION['tokens']) && is_array($_SESSION['tokens']) ) ? $_SESSION['tokens'] : [];
 		$_SESSION['oldest_token'] = ( !empty($_SESSION['oldest_token']) ) ? (float) $_SESSION['oldest_token'] : 0.0;
-		$_SESSION['sfs_ban_cache'] = ( isset($_SESSION['sfs_ban_cache']) && is_array($_SESSION['sfs_ban_cache']) ) ? $_SESSION['sfs_ban_cache'] : array();
+		$_SESSION['sfs_ban_cache'] = ( isset($_SESSION['sfs_ban_cache']) && is_array($_SESSION['sfs_ban_cache']) ) ? $_SESSION['sfs_ban_cache'] : [];
 		
 	}
 	
@@ -126,7 +126,7 @@ class session {
 	 * @param string $location Current forum location (current location when missing)
 	 * @param int $user_id New user ID (current ID when missing)
 	 */
-	function update($location=NULL, $user_id=NULL) {
+	function update(?string $location=NULL, ?int $user_id=NULL) {
 		
 		global $functions, $db;
 		
@@ -160,7 +160,7 @@ class session {
 		if ( $functions->get_config('enable_ip_bans') ) {
 			
 			$result = $db->query("SELECT ip_addr FROM ".TABLE_PREFIX."bans WHERE ip_addr <> ''");
-			$banned_ips_sql = array();
+			$banned_ips_sql = [];
 			while ( $out = $db->fetch_result($result) ) {
 				
 				$out['ip_addr'] = stripslashes($out['ip_addr']);
@@ -182,7 +182,7 @@ class session {
 		//
 		if ( $run_cleanup ) {
 			
-			$add_to_remove_query = array();
+			$add_to_remove_query = [];
 			
 			//
 			// Remove older clone sessions if needed
@@ -317,7 +317,7 @@ class session {
 			
 		}
 		
-		$spam_opportunity = ( preg_match('#^(register|editprofile|reply:|posttopic:|sendemail:)#', $location) );
+		$spam_opportunity = ( !empty($location) && preg_match('#^(register|editprofile|reply:|posttopic:|sendemail:)#', $location) );
 		
 		//
 		// DNSBL powered banning
@@ -547,7 +547,7 @@ class session {
 			//
 			// Do not use these timestamps for the logged in user.
 			//
-			$_SESSION['viewed_topics'] = array();
+			$_SESSION['viewed_topics'] = [];
 			
 		}
 		
@@ -644,35 +644,31 @@ class session {
 	 * Get user data
 	 *
 	 * @param int $user_id User ID
-	 * @returns array User data array from query
+	 * @return array User data array from query
 	 */
-	function get_user_data($user_id) {
-		
+	function get_user_data(int $user_id): array {
 		global $db;
 		
 		$result = $db->query("SELECT * FROM ".TABLE_PREFIX."members WHERE id = ".$user_id);
 		return $db->fetch_result($result);
-		
 	}
 	
 	/**
 	 * Check a user data to see if he/she may log in
 	 *
 	 * @param array $user_data User data array from query
-	 * @returns bool May login
+	 * @return bool May login
 	 */
-	function check_user($user_data) {
-		
+	function check_user(array $user_data): bool {
 		global $functions;
-		
+
 		return ( $user_data['active'] && !$user_data['banned'] && ( !$functions->get_config('board_closed') || $user_data['level'] == LEVEL_ADMIN ) );
-		
 	}
 
 	/**
 	 * Is search engine
 	 *
-	 * @returns bool Is search engine
+	 * @return bool Is search engine
 	 */
 	function is_search_engine() {
 		
@@ -755,7 +751,7 @@ class session {
 		
 		$db->query("DELETE FROM ".TABLE_PREFIX."sessions WHERE sess_id = '".session_id()."'");
 		$db->query("DELETE FROM ".TABLE_PREFIX."searches WHERE sess_id = '".session_id()."'");
-		$_SESSION = array();
+		$_SESSION = [];
 		session_destroy();
 		$functions->setcookie($functions->get_config('session_name').'_sid', '');
 		

@@ -172,5 +172,3 @@ if ( $_GET['act'] == 'login' ) {
 	$functions->redirect('index.php');
 	
 }
-
-?>

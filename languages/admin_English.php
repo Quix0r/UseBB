@@ -547,5 +547,3 @@ $lang['BansEmail'] = 'E-mail address';
 $lang['BansIp_addr'] = 'IP address';
 $lang['BansNoBansExist'] = 'No bans of this type exist at this forum.';
 $lang['BansIPBansDisabledInfo'] = 'IP address banning has been disabled in the board configuration.';
-
-?>

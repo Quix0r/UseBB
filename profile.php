@@ -257,5 +257,3 @@ if ( !empty($_GET['id']) && valid_int($_GET['id']) ) {
 	$functions->redirect('index.php');
 	
 }
-
-?>

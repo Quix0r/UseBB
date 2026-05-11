@@ -254,5 +254,3 @@ $functions->forum_stats_box();
 // Include the page footer
 //
 require(ROOT_PATH.'sources/page_foot.php');
-
-?>

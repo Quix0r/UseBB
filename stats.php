@@ -224,5 +224,3 @@ if ( !$functions->get_config('enable_stats') ) {
 // Include the page footer
 //
 require(ROOT_PATH.'sources/page_foot.php');
- 
-?>

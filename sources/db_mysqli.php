@@ -113,7 +113,7 @@ class db {
 	 *
 	 * @param string $query SQL query
 	 * @param bool $return_error Return error instead of giving general error
-	 * @returns mixed SQL result resource or SQL error (only when $return_error is true)
+	 * @return mixed SQL result resource or SQL error (only when $return_error is true)
 	 */
 	function query($query, $return_error=false, $log=true) {
 		
@@ -139,7 +139,7 @@ class db {
 	 * Fetch query results
 	 *
 	 * @param resource $result SQL query resource
-	 * @returns array Array containing one result
+	 * @return array Array containing one result
 	 */
 	function fetch_result(&$result) {
 		
@@ -160,7 +160,7 @@ class db {
 	 * Count row number
 	 *
 	 * @param resource $result SQL query resource
-	 * @returns int Number of result rows
+	 * @return int Number of result rows
 	 */
 	function num_rows(&$result) {
 		
@@ -171,7 +171,7 @@ class db {
 	/**
 	 * Last inserted ID
 	 *
-	 * @returns int Last inserted auto increment ID
+	 * @return int Last inserted auto increment ID
 	 */
 	function last_id() {
 		
@@ -182,7 +182,7 @@ class db {
 	/**
 	 * Get used queries array
 	 *
-	 * @returns array Array containing executed queries
+	 * @return array Array containing executed queries
 	 */
 	function get_used_queries() {
 		
@@ -193,7 +193,7 @@ class db {
 	/**
 	 * Get server version info
 	 *
-	 * @returns array Array containing database driver info and server version
+	 * @return array Array containing database driver info and server version
 	 */
 	function get_server_info() {
 		

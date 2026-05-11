@@ -566,5 +566,3 @@ if ( ( !empty($_GET['id']) && valid_int($_GET['id']) ) || ( !empty($_GET['post']
 	$functions->redirect('index.php');
 	
 }
-
-?>

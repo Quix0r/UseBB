@@ -367,5 +367,3 @@ if ( !empty($_GET['forum']) && valid_int($_GET['forum']) ) {
 // Include the page footer
 //
 require(ROOT_PATH.'sources/page_foot.php');
-	
-?>

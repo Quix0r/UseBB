@@ -273,11 +273,9 @@ if ( empty($_GET['act']) ) {
 	// Include the page footer
 	//
 	require(ROOT_PATH.'sources/page_foot.php');
-	
 } else {
-	
+	//
+	// Redirect to instance page
+	//
 	$functions->redirect('index.php');
-	
 }
-
-?>

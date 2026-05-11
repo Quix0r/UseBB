@@ -359,5 +359,3 @@ if ( !$functions->get_config('enable_detailed_online_list') ) {
 // Include the page footer
 //
 require(ROOT_PATH.'sources/page_foot.php');
-
-?>

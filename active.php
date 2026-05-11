@@ -189,5 +189,3 @@ if ( $functions->get_user_level() < $functions->get_config('view_active_topics_m
 // Include the page footer
 //
 require(ROOT_PATH.'sources/page_foot.php');
-
-?>

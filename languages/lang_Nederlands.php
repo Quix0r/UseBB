@@ -577,5 +577,3 @@ $lang['date_translations'] = array(
 	'nd' => 'de',
 	'th' => 'de'
 );
-
-?>

@@ -533,5 +533,3 @@ $lang['BansEmail'] = 'E-mailadres';
 $lang['BansIp_addr'] = 'IP-adres';
 $lang['BansNoBansExist'] = 'Geen bans van dit type bestaan reeds op dit forum.';
 $lang['BansIPBansDisabledInfo'] = 'IP-adresbans zijn uitgeschakeld in de forumconfiguratie.';
-
-?>

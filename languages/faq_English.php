@@ -76,5 +76,3 @@ $faq[] = array('--', 'UseBB Issues');
 $faq[] = array('Who made this forum? What is UseBB?', 'This bulletin board, called <em>UseBB</em>, is developed by the UseBB Project. UseBB is Open Source software released under the GPL. You can download UseBB for free from <a href="http://www.usebb.net">www.usebb.net</a>. Note the administrator(s) of this forum/website may have added additional functionality.');
 $faq[] = array('Are the creators of UseBB responsible for this forum?', 'No, this board is maintained by the website\'s webmaster(s). The UseBB Project can not be held responsible for this forum in any way.');
 $faq[] = array('I have a complaint about this forum. To whom should I direct?', 'If you have a complaint about the forum software itself, not the content, you are welcome to <a href="http://www.usebb.net">tell the UseBB Project</a>. For any other inquiries, please contact the administrator(s) of this forum/website.');
-
-?>

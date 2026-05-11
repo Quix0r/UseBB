@@ -176,5 +176,3 @@ if ( $functions->get_user_level() == LEVEL_ADMIN ) {
 // Include the page footer
 //
 require(ROOT_PATH.'sources/page_foot.php');
-
-?>

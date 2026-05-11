@@ -63,5 +63,3 @@ if ( !empty($_GET['topic']) && valid_int($_GET['topic']) ) {
 	$functions->redirect('index.php');
 	
 }
-
-?>

@@ -76,7 +76,7 @@ function usebb_clean_input_value(&$value, $key, $mq=false) {
 		
 	} else {
 		
-		if ( !$mq )
+		if ( !$mq && !empty($value) )
 			$value = addslashes($value);
 		
 		$value = trim($value);
@@ -92,11 +92,11 @@ function usebb_clean_input_value(&$value, $key, $mq=false) {
  */
 function usebb_clean_db_value(&$value, $key) {
 	
-	if ( is_array($value) )
+	if ( is_array($value) ) {
 		array_walk($value, 'usebb_clean_db_value');
-	else
+	} elseif (!empty($value)) {
 		$value = addslashes($value);
-	
+	}
 }
 
 /**
@@ -104,7 +104,7 @@ function usebb_clean_db_value(&$value, $key) {
  *
  * @param string $string String to check
  * @param bool $num_only Look for &#...; only
- * @returns bool Contains entities
+ * @return bool Contains entities
  */
 function contains_entities($string, $num_only=false) {
 	
@@ -119,7 +119,7 @@ function contains_entities($string, $num_only=false) {
  * @link http://drupal.org/node/579286
  *
  * @param string $string String
- * @returns string String
+ * @return string String
  */
 function named_entities_to_numeric($string) {
 	
@@ -383,9 +383,9 @@ function named_entities_to_numeric($string) {
  *
  * @param string $string String to un-HTML
  * @param bool $rss_mode Do hexadecimal escaping of &, < and > ONLY
- * @returns string Parsed $string
+ * @return string Parsed $string
  */
-function unhtml($string, $rss_mode=false) {
+function unhtml(string $string, bool $rss_mode=false): string {
 	
 	$string = htmlspecialchars($string);
 	
@@ -410,9 +410,9 @@ function unhtml($string, $rss_mode=false) {
  * Gives the length of a string and counts a HTML entitiy as one character.
  *
  * @param string $string String to find length of
- * @returns int Length of $string
+ * @return int Length of $string
  */
-function entities_strlen($string) {
+function entities_strlen(string $string): int {
 	
 	if ( strpos($string, '&') !== false )
 		$string = preg_replace('#&\#?[^;]+;#', '.', $string);
@@ -426,7 +426,7 @@ function entities_strlen($string) {
  *
  * @param string $string String to trim
  * @param int $length Length of new string
- * @returns string Trimmed string
+ * @return string Trimmed string
  */
 function entities_rtrim($string, $length) {
 	
@@ -482,22 +482,16 @@ function entities_rtrim($string, $length) {
  * If so, correct it (intval).
  *
  * @param string $string String to check
- * @returns bool Contains valid integer
+ * @return bool Contains valid integer
  */
-function valid_int(&$string) {
-	
+function valid_int(string|int &$string): bool {
 	if ( $string == strval(intval($string)) ) {
 		
 		$string = (int) $string;
-		
 		return true;
-		
-	} else {
-		
-		return false;
-		
 	}
-	
+
+	return false;
 }
 
 /**
@@ -507,9 +501,9 @@ function valid_int(&$string) {
  * @link http://www.zend.com/codex.php?id=370&single=1
  * @param string $host host
  * @param string $type type
- * @returns bool Contains valid integer
+ * @return bool Contains valid integer
  */
-function checkdnsrr_win($host, $type='') {
+function checkdnsrr_win(string $host, string $type=''): bool {
 	
 	$types = array(
 		'A',
@@ -559,20 +553,20 @@ class functions {
 	/**#@+
 	 * @access private
 	 */
-	var $board_config = array();
-	var $board_config_original = array();
-	var $board_config_defined = array();
-	var $statistics = array();
-	var $languages = array();
-	var $language_sections = array();
-	var $mod_auth;
-	var $badwords;
-	var $updated_forums;
-	var $available = array('templates' => array(), 'languages' => array());
-	var $db_tables = array();
-	var $server_load;
-	var $is_mbstring;
-	var $date_format_from_db = FALSE;
+	private $board_config = [];
+	private $board_config_original = [];
+	private $board_config_defined = [];
+	private $statistics = [];
+	private $languages = [];
+	private $language_sections = [];
+	private $mod_auth;
+	private $badwords;
+	private $updated_forums;
+	private $available = array('templates' => [], 'languages' => []);
+	private $db_tables = [];
+	private $server_load;
+	private $is_mbstring;
+	private $date_format_from_db = FALSE;
 	/**#@-*/
 	
 	/**
@@ -777,9 +771,9 @@ class functions {
 	 *
 	 * @param string $setting Setting to retrieve
 	 * @param bool $original Use original config.php configuration
-	 * @returns mixed Value of setting
+	 * @return mixed Value of setting
 	 */
-	function get_config($setting, $original=false) {
+	function get_config(string $setting, bool $original=false): mixed {
 		
 		global $session;
 
@@ -838,7 +832,7 @@ class functions {
 					break;
 				case 'dnsbl_powered_banning_whitelist':
 				case 'dnsbl_powered_banning_servers':
-					$set_to = array();
+					$set_to = [];
 					break;
 				case 'username_max_length':
 					$set_to = 30;
@@ -972,9 +966,9 @@ class functions {
 	 * Get board statistics
 	 *
 	 * @param string $stat Statistical value to retrieve
-	 * @returns mixed Statistical value
+	 * @return mixed Statistical value
 	 */
-	function get_stats($stat) {
+	function get_stats(string $stat): mixed {
 		
 		global $db;
 		
@@ -1039,17 +1033,17 @@ class functions {
 	 * @param string $stat Statistical value to set
 	 * @param mixed $value New value
 	 * @param bool $add Add to current value or not
+	 * @return void
 	 */
-	function set_stats($stat, $value, $add=false) {
-		
+	function set_stats(string $stat, mixed $value, bool $add=false): void {
 		global $db;
-		
-		if ( $add )
+
+		if ( $add ) {
 			$value = $this->get_stats($stat) + $value;
+		}
 
 		$db->query("UPDATE ".TABLE_PREFIX."stats SET content = '".$value."' WHERE name = '".$stat."'");
 		$this->statistics[$stat] = $value;
-
 	}
 
 	/**
@@ -1057,9 +1051,9 @@ class functions {
 	 *
 	 * @param string $filename base filename to link to
 	 * @param array $vars GET variabeles
-	 * @returns string URL
+	 * @return string URL
 	 */
-	function _make_friendly_url($filename, $vars) {
+	function _make_friendly_url(string $filename, array $vars): string {
 		
 		if ( $filename == 'index' && count($vars) == 0 )
 			return './';
@@ -1085,9 +1079,9 @@ class functions {
 	 * @param bool $enable_sid Enable session ID's
 	 * @param bool $force_php Force linking to .php files
 	 * @param bool $enable_token Enable token (forces .php link)
-	 * @returns string URL
+	 * @return string URL
 	 */
-	function make_url($filename, $vars=array(), $html=true, $enable_sid=true, $force_php=false, $enable_token=false) {
+	function make_url(string $filename, array $vars=[], bool $html=true, bool $enable_sid=true, bool $force_php=false, bool $enable_token=false): string {
 		
 		global $session;
 		
@@ -1102,7 +1096,7 @@ class functions {
 		if ( is_array($vars) )
 			unset($vars[$this->get_config('session_name').'_sid']);
 		else
-			$vars = array();
+			$vars = [];
 
 		//
 		// No session IDs for search engines
@@ -1160,9 +1154,9 @@ class functions {
 	 * Attaches a SID to URLs which should contain one (e.g. referer URLs)
 	 *
 	 * @param string $url URL
-	 * @returns string URL
+	 * @return string URL
 	 */
-	function attach_sid($url) {
+	function attach_sid(string $url): string {
 		
 		$SID = SID;
 		
@@ -1181,9 +1175,9 @@ class functions {
 	 *
 	 * @param string $language Language name (default language is used when missing)
 	 * @param string $section Section name (main section is used when missing)
-	 * @returns array Language variables
+	 * @return array Language variables
 	 */
-	function fetch_language($language='', $section='') {
+	function fetch_language(string $language='', string $section=''): array {
 		
 		$language = ( !empty($language) && in_array($language, $this->get_language_packs()) ) ? $language : $this->get_config('language');
 		$section = ( !empty($section) ) ? $section : 'lang';
@@ -1271,8 +1265,9 @@ class functions {
 			$this->languages[$language] = $lang;
 		}
 		
-		if ( !isset($this->language_sections[$language]) )
-			$this->language_sections[$language] = array();
+		if ( !isset($this->language_sections[$language]) ) {
+			$this->language_sections[$language] = [];
+		}
 		$this->language_sections[$language][] = $section;
 		
 		$returned = &$this->languages[$language];
@@ -1283,7 +1278,7 @@ class functions {
 	/**
 	 * Kick a user to the login form
 	 */
-	function redir_to_login() {
+	function redir_to_login(): void {
 		
 		global $session, $template, $lang;
 		
@@ -1313,9 +1308,9 @@ class functions {
 	 * @param string $format Date format syntax (identical to PHP's date() - default is used when missing)
 	 * @param bool $keep_gmt Use GMT and no time zones
 	 * @param bool $translate Localize dates
-	 * @returns string Date
+	 * @return string Date
 	 */
-	function make_date($stamp, $format='', $keep_gmt=false, $translate=true) {
+	function make_date(int $stamp, string $format='', bool $keep_gmt=false, bool $translate=true): string {
 		
 		global $lang;
 		
@@ -1341,15 +1336,15 @@ class functions {
 	 *
 	 * @param int $timestamp Unix timestamp
 	 * @param int $until Calculate time past until this Unix timestamp (current is used when missing)
-	 * @returns string Time past
+	 * @return string Time past
 	 */
-	function time_past($timestamp, $until=null) {
+	function time_past(int $timestamp, ?int $until=null): string {
 	
 		global $lang;
 	
 		$seconds = ( ( is_int($until) ) ? $until : time() ) - $timestamp;
 	
-		$times = array();
+		$times = [];
 		$sections = array(
 			'weeks' => 604800,
 			'days' => 86400,
@@ -1369,7 +1364,7 @@ class functions {
 			
 		}
 	
-		$sections = array();
+		$sections = [];
 		foreach ( $times as $key => $val )
 			$sections[] = $val.' '.$lang[ucfirst($key)];
 	
@@ -1381,9 +1376,9 @@ class functions {
 	 * Generate an e-mail link/text
 	 *
 	 * @param array $user User information containing id, email and email_show
-	 * @returns string HTML
+	 * @return string HTML
 	 */
-	function show_email($user) {
+	function show_email(array $user): string {
 		
 		global $session, $lang;
 		
@@ -1444,9 +1439,9 @@ class functions {
 	 * This function only works for ASCII characters, nothing else.
 	 *
 	 * @param string $string String to convert
-	 * @returns string Converted string
+	 * @return string Converted string
 	 */
-	function string_to_entities($string) {
+	function string_to_entities(string $string): string {
 		
 		$length = strlen($string);
 		$new_string = '';
@@ -1461,9 +1456,9 @@ class functions {
 	 * Generate a random key
 	 *
 	 * @param bool $is_password Is the random key used as a password?
-	 * @returns string Random key
+	 * @return string Random key
 	 */
-	function random_key($is_password=false) {
+	function random_key(bool $is_password=false): string {
 		
 		if ( !$is_password )
 			return md5(mt_rand());
@@ -1503,11 +1498,11 @@ class functions {
 	 * @param string $language Language name the e-mail is in (default language when missing)
 	 * @param string $charset Character set the e-mail is in (default charset when missing)
 	 */
-	function usebb_mail($subject, $rawbody, $bodyvars=array(), $from_name, $from_email, $to, $bcc_email='', $language='', $charset='') {
+	function usebb_mail(string $subject, string $rawbody, array $bodyvars, string $from_name, string $from_email, string $to, string $bcc_email='', string $language='', string $charset='') {
 		
 		global $lang;
 		
-		$bodyvars = ( is_array($bodyvars) ) ? $bodyvars : array();
+		$bodyvars = ( is_array($bodyvars) ) ? $bodyvars : [];
 		
 		$is_enable_mbstring = ( function_exists('mb_language') && mb_language() != 'neutral' );
 
@@ -1547,7 +1542,7 @@ class functions {
 		foreach ( $bodyvars as $key => $val )
 			$body = str_replace('['.$key.']', $val, $body);
 		
-		$headers = array();
+		$headers = [];
 		
 		if ( $is_mbstring && function_exists('mb_encode_mimeheader') ) {
 			
@@ -1652,7 +1647,7 @@ class functions {
 	/**
 	 * Is the remember cookie set?
 	 *
-	 * @returns bool Remember cookie set
+	 * @return bool Remember cookie set
 	 */
 	function isset_al() {
 		
@@ -1670,7 +1665,7 @@ class functions {
 	/**
 	 * Get the remember cookie's value
 	 *
-	 * @returns mixed Array with user ID and password hash -or- false when not set
+	 * @return mixed Array with user ID and password hash -or- false when not set
 	 */
 	function get_al() {
 		
@@ -1684,7 +1679,7 @@ class functions {
 	/**
 	 * Get the user's level
 	 *
-	 * @returns int User level
+	 * @return int User level
 	 */
 	function get_user_level() {
 		
@@ -1710,7 +1705,7 @@ class functions {
 	 * @param int $forum_id ID of forum
 	 * @param bool $self For own account
 	 * @param array $alternative_user_info When not for own account, array with user information
-	 * @returns bool Allowed
+	 * @return bool Allowed
 	 */
 	function auth($auth_int, $action, $forum_id, $self=true, $alternative_user_info=null) {
 		
@@ -1737,7 +1732,7 @@ class functions {
 				if ( !is_array($this->mod_auth) ) {
 					
 					$result = $db->query("SELECT forum_id FROM ".TABLE_PREFIX."moderators WHERE user_id = ".$user_info['id']);
-					$this->mod_auth = array();
+					$this->mod_auth = [];
 					while ( $out = $db->fetch_result($result) )
 						$this->mod_auth[] = intval($out['forum_id']);
 					
@@ -1797,13 +1792,13 @@ class functions {
 	 *
 	 * @param int $forum Forum ID
 	 * @param array $listarray Array with all moderators (automatically requested when missing)
-	 * @returns string Moderator list
+	 * @return string Moderator list
 	 */
 	function get_mods_list($forum, $listarray=false) {
 		
 		global $db, $lang;
 		
-		$forum_moderators = array();
+		$forum_moderators = [];
 		
 		if ( is_array($listarray) && count($listarray) ) {
 			
@@ -1853,15 +1848,15 @@ class functions {
 	 * @param bool $back_forward_links Enable back and forward links
 	 * @param array $url_vars Other URL vars
 	 * @param bool $force_php Force linking to .php files
-	 * @returns string HTML
+	 * @return string HTML
 	 */
-	function make_page_links($pages_number, $current_page, $items_number, $items_per_page, $page_name, $page_id_val=NULL, $back_forward_links=true, $url_vars=array(), $force_php=false) {
+	function make_page_links($pages_number, $current_page, $items_number, $items_per_page, $page_name, $page_id_val=NULL, $back_forward_links=true, $url_vars=[], $force_php=false) {
 		
 		global $lang;
 		
 		if ( intval($items_number) > intval($items_per_page) ) {
 			
-			$page_links = array();
+			$page_links = [];
 			$page_links_groups_length = 4;
 			
 			if ( !$current_page ) {
@@ -1947,7 +1942,7 @@ class functions {
 	 * Removes BBCode
 	 *
 	 * @param string $string Text string to clean
-	 * @returns string Cleaned text
+	 * @return string Cleaned text
 	 */
 	function bbcode_clear($string) {
 		
@@ -1962,7 +1957,7 @@ class functions {
 	 * Checks if the post is empty, with and without BBCode
 	 *
 	 * @param string $string Text
-	 * @returns bool Is empty
+	 * @return bool Is empty
 	 */
 	function post_empty(&$string) {
 		
@@ -1985,7 +1980,7 @@ class functions {
 	 * Automatically called from within ::markup.
 	 *
 	 * @param string $string Text string to preparse
-	 * @returns string Corrected BBCoded text
+	 * @return string Corrected BBCoded text
 	 */
 	function bbcode_prepare($string) {
 		
@@ -1997,13 +1992,13 @@ class functions {
 		//
 		$parts = array_reverse(preg_split('#(\[/?[a-z][^\[\]]*\])#i', $string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY));
 		
-		$open_tags = $open_parameters = array();
+		$open_tags = $open_parameters = [];
 		$new_string = '';
 		
 		while ( count($parts) ) {
 			
 			$part = array_pop($parts);
-			$matches = array();
+			$matches = [];
 			
 			//
 			// Add open tag
@@ -2088,7 +2083,7 @@ class functions {
 				//
 				if ( in_array($matches[1], $open_tags) ) {
 					
-					$to_reopen_tags = $to_reopen_parameters = array();
+					$to_reopen_tags = $to_reopen_parameters = [];
 					
 					while ( $open_tag = array_pop($open_tags) ) {
 						
@@ -2158,7 +2153,7 @@ class functions {
 	 * @param bool $html Enable HTML
 	 * @param bool $rss_mode Enable RSS mode
 	 * @param bool $links Enable links parsing
-	 * @returns string HTML
+	 * @return string HTML
 	 */
 	function markup($string, $bbcode=true, $smilies=true, $html=false, $rss_mode=false, $links=true) {
 		
@@ -2195,7 +2190,7 @@ class functions {
 			
 			$string = ' '.$this->bbcode_prepare($string).' ';
 			
-			$rel = array();
+			$rel = [];
 			if ( $this->get_config('target_blank') )
 				$rel[] = 'external';
 			if ( $this->get_config('rel_nofollow') )
@@ -2348,7 +2343,7 @@ class functions {
 	 * Return the BBCode control buttons
 	 *
 	 * @param bool $links Enable controls for links
-	 * @returns string HTML BBCode controls
+	 * @return string HTML BBCode controls
 	 */
 	function get_bbcode_controls($links=true) {
 		
@@ -2377,7 +2372,7 @@ class functions {
 			array('[size=14]', '[/size]', $lang['Size'], '')
 		));
 		
-		$out = array();
+		$out = [];
 		foreach ( $controls as $data )
 			$out[] = '<a href="javascript:void(0);" onclick="insert_tags(\''.$data[0].'\', \''.$data[1].'\')" style="'.$data[3].'">'.$data[2].'</a>';
 		
@@ -2388,7 +2383,7 @@ class functions {
 	/**
 	 * Return the smiley control graphics
 	 *
-	 * @returns string HTML smiley controls
+	 * @return string HTML smiley controls
 	 */
 	function get_smiley_controls() {
 		
@@ -2396,7 +2391,7 @@ class functions {
 		
 		$smilies = $template->get_config('smilies');
 		$smilies = array_unique($smilies);
-		$out = array();
+		$out = [];
 		foreach ( $smilies as $pattern => $img )
 			$out[] = '<a href="javascript:void(0)" onclick="insert_smiley(\''.addslashes(unhtml($pattern)).'\')"><img src="templates/'.$this->get_config('template').'/smilies/'.$img.'" alt="'.unhtml($pattern).'" /></a>';
 		
@@ -2408,7 +2403,7 @@ class functions {
 	 * Censor text
 	 *
 	 * @param string $string Text to censor
-	 * @returns string Censored text
+	 * @return string Censored text
 	 */
 	function replace_badwords($string) {
 		
@@ -2422,7 +2417,7 @@ class functions {
 			if ( !isset($this->badwords) ) {
 				
 				$result = $db->query("SELECT word, replacement FROM ".TABLE_PREFIX."badwords ORDER BY word ASC");
-				$this->badwords = array();
+				$this->badwords = [];
 				while ( $data = $db->fetch_result($result) )
 					$this->badwords['#\b(?:' . str_replace('\*', '\w*?', preg_quote(stripslashes($data['word']), '#')) . ')\b#i'] = stripslashes($data['replacement']);
 				
@@ -2442,7 +2437,7 @@ class functions {
 	 *
 	 * @param string $action 'get_zones' or 'check_existance'
 	 * @param mixed $param Time zone param for 'check_existance'
-	 * @returns mixed Array with timezones or bool
+	 * @return mixed Array with timezones or bool
 	 */
 	function timezone_handler($action, $param=NULL) {
 		
@@ -2501,7 +2496,7 @@ class functions {
 	 * @param string $username Username
 	 * @param int $level Level
 	 * @param string $title Title attribute
-	 * @returns string HTML
+	 * @return string HTML
 	 */
 	function make_profile_link($user_id, $username, $level, $title=null) {
 		
@@ -2555,10 +2550,10 @@ class functions {
 				'guests' => 0
 			);
 			$list = array(
-				'members' => array(),
-				'guests' => array()
+				'members' => [],
+				'guests' => []
 			);
-			$memberlist = array();
+			$memberlist = [];
 			
 			while ( $onlinedata = $db->fetch_result($result) ) {
 				
@@ -2636,7 +2631,7 @@ class functions {
 	 * Get the server's load avarage value
 	 *
 	 * @param integer $which What load variable to call ('all' for an array of all)
-	 * @returns float Server load average
+	 * @return float Server load average
 	 */
 	function get_server_load($which=1) {
 		
@@ -2686,7 +2681,7 @@ class functions {
 				//
 				// Second attempt: executing uptime
 				//
-				$tmp = array();
+				$tmp = [];
 				$retval = 1;
 				$out = exec('uptime', $tmp, $retval);
 				unset($tmp);
@@ -2732,7 +2727,7 @@ class functions {
 	 * @param int $id Forum ID
 	 * @param bool $open Open (or locked)
 	 * @param int $post_time Unix timestamp of update
-	 * @returns array Array with forum icon and status
+	 * @return array Array with forum icon and status
 	 */
 	function forum_icon($id, $open, $post_time) {
 		
@@ -2741,7 +2736,7 @@ class functions {
 		if ( $session->sess_info['user_id'] && !empty($_SESSION['previous_visit']) && !is_array($this->updated_forums) ) {
 			
 			$result = $db->query("SELECT t.id, t.forum_id, p.post_time FROM ".TABLE_PREFIX."topics t, ".TABLE_PREFIX."posts p WHERE p.id = t.last_post_id AND p.post_time > ".$_SESSION['previous_visit']);
-			$this->updated_forums = array();
+			$this->updated_forums = [];
 			while ( $topicsdata = $db->fetch_result($result) ) {
 				
 				if ( !in_array($topicsdata['forum_id'], $this->updated_forums) && ( !isset($_SESSION['viewed_topics']['t'.$topicsdata['id']]) || $_SESSION['viewed_topics']['t'.$topicsdata['id']] < $topicsdata['post_time'] ) )
@@ -2791,7 +2786,7 @@ class functions {
 	 * @param int $id Topic ID
 	 * @param bool $locked Locked (or open)
 	 * @param int $post_time Unix timestamp of update
-	 * @returns array Array with topic icon and status
+	 * @return array Array with topic icon and status
 	 */
 	function topic_icon($id, $locked, $post_time) {
 		
@@ -2835,7 +2830,7 @@ class functions {
 	 * Return birthday input fields
 	 *
 	 * @param string $input Input birthday field
-	 * @returns array Input fields
+	 * @return array Input fields
 	 */
 	function birthday_input_fields($input) {
 		
@@ -2890,7 +2885,7 @@ class functions {
 	 * Calculate the age of a person based on a birthday date
 	 *
 	 * @param int $birthday Unix timestamp
-	 * @returns int Age
+	 * @return int Age
 	 */
 	function calculate_age($birthday) {
 		
@@ -2922,7 +2917,7 @@ class functions {
 	/**
 	 * Get a list of template sets
 	 *
-	 * @returns array List of available template sets
+	 * @return array List of available template sets
 	 */
 	function get_template_sets() {
 		
@@ -2948,7 +2943,7 @@ class functions {
 	/**
 	 * Get a list of language packs
 	 *
-	 * @returns array List of available language packs
+	 * @return array List of available language packs
 	 */
 	function get_language_packs() {
 		
@@ -2974,7 +2969,7 @@ class functions {
 	/**
 	 * Return the sql tables with the table prefix
 	 *
-	 * @returns array List of SQL tables with UseBB table prefix
+	 * @return array List of SQL tables with UseBB table prefix
 	 */
 	function get_usebb_tables() {
 		
@@ -2999,7 +2994,7 @@ class functions {
 	 * @param array $vars Array with GET variables
 	 * @param string $anchor HTML anchor
 	 */
-	function redirect($page, $vars=array(), $anchor='') {
+	function redirect($page, $vars=[], $anchor='') {
 		
 		$goto = $this->get_config('board_url').$this->make_url($page, $vars, false);
 		
@@ -3034,7 +3029,7 @@ class functions {
 	 *
 	 * @param string $password Password
 	 * @param bool $extended Extended checking (new passwords)
-	 * @returns bool Valid
+	 * @return bool Valid
 	 */
 	function validate_password($password, $extended=false) {
 		
@@ -3054,7 +3049,7 @@ class functions {
 	 * Validate an email address
 	 *
 	 * @param string $email_address Email address
-	 * @returns bool Valid
+	 * @return bool Valid
 	 */
 	function validate_email($email_address) {
 		
@@ -3236,7 +3231,7 @@ class functions {
 	 *
 	 * @link https://github.com/usebb/UseBB/wiki/UseBB-1-CSRF
 	 *
-	 * @returns string Token
+	 * @return string Token
 	 */
 	function generate_token() {
 
@@ -3268,7 +3263,7 @@ class functions {
 	 * @link https://github.com/usebb/UseBB/wiki/UseBB-1-CSRF
 	 *
 	 * @param string $try_token Token to test
-	 * @returns bool Verified
+	 * @return bool Verified
 	 */
 	function verify_token($try_token) {
 
@@ -3320,7 +3315,7 @@ class functions {
 	 * @link https://github.com/usebb/UseBB/wiki/UseBB-1-CSRF
 	 *
 	 * @param bool $enable_message Enable error message
-	 * @returns bool Verified
+	 * @return bool Verified
 	 */
 	function verify_form($enable_message=true) {
 
@@ -3340,7 +3335,7 @@ class functions {
 	 * @link https://github.com/usebb/UseBB/wiki/UseBB-1-CSRF
 	 *
 	 * @param bool $enable_message Enable error message
-	 * @returns bool Verified
+	 * @return bool Verified
 	 */
 	function verify_url($enable_message=true) {
 
@@ -3358,7 +3353,7 @@ class functions {
 	 * Read a remote URL into string
 	 *
 	 * @param string $url URL
-	 * @returns string Contents
+	 * @return string Contents
 	 */
 	function read_url($url) {
 		
@@ -3440,9 +3435,9 @@ class functions {
 	 * @link http://www.stopforumspam.com/usage
 	 *
 	 * @param string $email Email address
-	 * @returns mixed FALSE if nothing found, array otherwise
+	 * @return mixed FALSE if nothing found, array otherwise
 	 */
-	function sfs_api_request($email) {
+	function sfs_api_request(string $email): mixed {
 
 		//
 		// Not really clean XML parsing code. Will improve for UseBB 2.
@@ -3473,7 +3468,7 @@ class functions {
 
 		}
 		
-		$return = array();
+		$return = [];
 
 		if ( preg_match('#<lastseen>([0-9]{4}\-[0-9]{2}\-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})</lastseen>#i', $result, $matches) )
 			$return['lastseen'] = strtotime($matches[1]);
@@ -3493,9 +3488,9 @@ class functions {
 	 * Check Stop Forum Spam for a banned email address.
 	 *
 	 * @param string $email Email address
-	 * @returns bool Banned
+	 * @return bool Banned
 	 */
-	function sfs_email_banned($email) {
+	function sfs_email_banned(string $email): bool {
 
 		global $db;
 		
@@ -3533,9 +3528,9 @@ class functions {
 	 * Submit account information to the Stop Forum Spam database.
 	 *
 	 * @param array $data Array with username, email and ip_addr.
-	 * @returns bool Success
+	 * @return bool Success
 	 */
-	function sfs_api_submit($data) {
+	function sfs_api_submit(array $data): bool {
 
 		$key = $this->get_config('sfs_api_key');
 
@@ -3561,9 +3556,9 @@ class functions {
 	 * @param array $user User array with active, level and posts.
 	 * @param bool $new_post Whether this is in a query increasing the post count.
 	 * @param bool $activate Whether this is when activating a user.
-	 * @returns int Active value
+	 * @return int Active value
 	 */
-	function user_active_value($user=NULL, $new_post=FALSE, $activate=FALSE) {
+	function user_active_value(?array $user=NULL, bool $new_post=FALSE, bool $activate=FALSE): int {
 		
 		//
 		// Potential spammer status not enabled
@@ -3629,9 +3624,9 @@ class functions {
 	 *
 	 * @param array $user User array with active, level and posts.
 	 * @param bool $new_post Whether this is for a request increasing the post count.
-	 * @returns bool Is potential spammer
+	 * @return bool Is potential spammer
 	 */
-	function antispam_is_potential_spammer($user, $new_post=FALSE) {
+	function antispam_is_potential_spammer(array $user, bool $new_post=FALSE): bool {
 		
 		//
 		// poster_level is sometimes used
@@ -3655,9 +3650,9 @@ class functions {
 	 *
 	 * @param array $user User array with active, level and posts.
 	 * @param bool $new_post Whether this is for a request increasing the post count.
-	 * @returns bool Whether can post links
+	 * @return bool Whether can post links
 	 */
-	function antispam_can_post_links($user, $new_post=FALSE) {
+	function antispam_can_post_links(array $user, bool $new_post=FALSE): bool {
 
 		return ( !$this->antispam_is_potential_spammer($user, $new_post) 
 			|| !$this->get_config('antispam_disable_post_links') );
@@ -3668,9 +3663,9 @@ class functions {
 	 * Can add profile links
 	 *
 	 * @param array $user User array with active, level and posts.
-	 * @returns bool Whether can add profile links
+	 * @return bool Whether can add profile links
 	 */
-	function antispam_can_add_profile_links($user) {
+	function antispam_can_add_profile_links(array $user): bool {
 
 		return ( !$this->antispam_is_potential_spammer($user, FALSE) 
 			|| !$this->get_config('antispam_disable_profile_links') );

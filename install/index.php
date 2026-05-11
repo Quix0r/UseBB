@@ -283,5 +283,3 @@ $out .= '		</form>
 
 $template->add_raw_content($out);
 $template->body();
-
-?>

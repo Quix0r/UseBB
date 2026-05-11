@@ -167,5 +167,3 @@ $template->parse('contents_footer', 'faq');
 // Include the page footer
 //
 require(ROOT_PATH.'sources/page_foot.php');
-
-?>

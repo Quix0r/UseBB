@@ -318,5 +318,3 @@ if ( !$functions->get_config('guests_can_access_board') && $functions->get_user_
 	exit();
 	
 }
-
-?>

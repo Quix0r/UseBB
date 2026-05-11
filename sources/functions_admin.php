@@ -170,7 +170,7 @@ class admin_functions {
 	 * Read a remote URL into string
 	 *
 	 * @param string $url URL
-	 * @returns string Contents
+	 * @return string Contents
 	 */
 	function read_remote_file($url) {
 
@@ -185,7 +185,7 @@ class admin_functions {
 	 *
 	 * @param string $module_name Module filename
 	 * @param string $actual_module_name Actual module filename (not checked on extension)
-	 * @returns mixed Array with module info or false when module is invalid
+	 * @return mixed Array with module info or false when module is invalid
 	 */
 	function check_module($module_name, $actual_module_name='') {
 		
@@ -260,7 +260,7 @@ class admin_functions {
 	 * Create the ACP menu
 	 *
 	 * @param string $location Current ACP location
-	 * @returns string HTML ACP menu
+	 * @return string HTML ACP menu
 	 */
 	function create_acp_menu($location) {
 		
@@ -329,7 +329,7 @@ class admin_functions {
 	 * Transform a variable into legal PHP code using var_export().
 	 *
 	 * @param mixed $variable Variable to transform to PHP
-	 * @returns string PHP code
+	 * @return string PHP code
 	 */
 	function make_php_string($variable) {
 		
@@ -402,7 +402,7 @@ class admin_functions {
 	 * @param bool $multiple Allow multiple selections
 	 * @param array $filter_ids Array containing forum ID's to exclude
 	 * @param string $add HTML to add as last elements in <select />
-	 * @returns string HTML <select />
+	 * @return string HTML <select />
 	 */
 	function forum_select_box($input_name, $multiple=true, $filter_ids=array(), $add='') {
 		
@@ -531,7 +531,7 @@ class admin_functions {
 	 * @param string $condition SQL condition to match members
 	 * @param bool $delete_posts Delete posts, or assign to guest
 	 * @param bool $ban_email Ban associated email addresses
-	 * @returns int Member count
+	 * @return int Member count
 	 */
 	function delete_members($condition, $delete_posts=false, $ban_email=false) {
 
@@ -768,7 +768,7 @@ class admin_functions {
 	/**
 	 * Get categories
 	 *
-	 * @returns array Array containing category information
+	 * @return array Array containing category information
 	 */
 	function get_cats_array() {
 		
@@ -786,7 +786,7 @@ class admin_functions {
 	/**
 	 * Get forums
 	 *
-	 * @returns array Array containing forum information
+	 * @return array Array containing forum information
 	 */
 	function get_forums_array() {
 		
@@ -816,7 +816,7 @@ class admin_functions {
 	/**
 	 * Form token input field
 	 *
-	 * @returns string Input field
+	 * @return string Input field
 	 */
 	function form_token() {
 
@@ -842,7 +842,7 @@ class admin_functions {
 	/**
 	 * Show ACP info message
 	 *
-	 * @returns string Message
+	 * @return string Message
 	 */
 	function show_acp_msg() {
 
