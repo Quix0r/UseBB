@@ -175,5 +175,3 @@ if ( !empty($_GET['id']) && valid_int($_GET['id']) ) {
 }
 
 $admin_functions->create_body('delete_members', $content);
-
-?>

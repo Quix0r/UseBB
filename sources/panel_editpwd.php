@@ -122,5 +122,3 @@ if ( !empty($_POST['current_passwd']) && !empty($_POST['new_passwd2']) && md5(st
 	$template->set_js_onload("set_focus('current_passwd')");
 	
 }
-
-?>

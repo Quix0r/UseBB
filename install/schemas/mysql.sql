@@ -21,7 +21,7 @@ CREATE TABLE usebb_bans (
   name varchar(255) NOT NULL default '',
   email varchar(255) NOT NULL default '',
   ip_addr varchar(23) NOT NULL default '',
-  PRIMARY KEY  (id)
+  PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB;
 
 ----------------------------------------------------------
@@ -34,7 +34,8 @@ CREATE TABLE usebb_cats (
   id int(11) NOT NULL auto_increment,
   name varchar(255) NOT NULL default '',
   sort_id int(11) NOT NULL default '0',
-  PRIMARY KEY  (id)
+  PRIMARY KEY  (`id`),
+  INDEX `sort_id` (`sort_id`)
 ) ENGINE=InnoDB;
 
 ----------------------------------------------------------
@@ -57,7 +58,9 @@ CREATE TABLE usebb_forums (
   auto_lock int(11) NOT NULL default '0',
   increase_post_count int(1) NOT NULL default '1',
   hide_mods_list int(1) NOT NULL default '0',
-  PRIMARY KEY  (id)
+  PRIMARY KEY  (`id`),
+  INDEX `last_topic_id` (`last_topic_id`),
+  INDEX `sort_id` (`sort_id`)
 ) ENGINE=InnoDB;
 
 ----------------------------------------------------------
@@ -113,7 +116,7 @@ CREATE TABLE usebb_members (
   icq varchar(255) NOT NULL default '',
   jabber varchar(255) NOT NULL default '',
   skype varchar(255) NOT NULL default '',
-  PRIMARY KEY  (id),
+  PRIMARY KEY  (`id`),
   UNIQUE `email` (`email`)
   UNIQUE `name` (`name`)
 ) ENGINE=InnoDB;
@@ -149,7 +152,7 @@ CREATE TABLE usebb_posts (
   enable_smilies int(1) NOT NULL default '1',
   enable_sig int(1) NOT NULL default '1',
   enable_html int(1) NOT NULL default '0',
-  PRIMARY KEY  (id)
+  PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB;
 
 ----------------------------------------------------------
@@ -221,7 +224,9 @@ CREATE TABLE usebb_topics (
   count_views int(11) NOT NULL default '0',
   status_locked int(1) NOT NULL default '0',
   status_sticky int(1) NOT NULL default '0',
-  PRIMARY KEY  (id)
+  PRIMARY KEY  (`id`),
+  INDEX `first_post_id` (`first_post_id`),
+  INDEX `last_post_id` (`last_post_id`);
 ) ENGINE=InnoDB;
 
 ----------------------------------------------------------
@@ -262,7 +267,7 @@ CHANGE `cat_id` `cat_id` int(11) unsigned NOT NULL DEFAULT '0' AFTER `name`,
 CHANGE `status` `status` tinyint(1) unsigned NOT NULL DEFAULT '1' AFTER `descr`,
 CHANGE `topics` `topics` int(11) unsigned NOT NULL DEFAULT '0' AFTER `status`,
 CHANGE `posts` `posts` int(11) unsigned NOT NULL DEFAULT '0' AFTER `topics`,
-CHANGE `last_topic_id` `last_topic_id` int(11) unsigned NOT NULL DEFAULT '0' AFTER `posts`,
+CHANGE `last_topic_id` `last_topic_id` int(11) unsigned NULL AFTER `posts`;
 CHANGE `sort_id` `sort_id` int(11) unsigned NOT NULL DEFAULT '0' AFTER `last_topic_id`,
 CHANGE `auto_lock` `auto_lock` int(11) unsigned NOT NULL DEFAULT '0' AFTER `auth`,
 CHANGE `increase_post_count` `increase_post_count` tinyint(1) unsigned NOT NULL DEFAULT '1' AFTER `auto_lock`,
@@ -271,16 +276,6 @@ CHANGE `hide_mods_list` `hide_mods_list` tinyint(1) unsigned NOT NULL DEFAULT '0
 ALTER TABLE `usebb_cats`
 CHANGE `id` `id` int(11) unsigned NOT NULL AUTO_INCREMENT FIRST,
 CHANGE `sort_id` `sort_id` int(11) unsigned NOT NULL AFTER `name`;
-
-ALTER TABLE `usebb_pm`
-CHANGE `id` `id` int(11) unsigned NOT NULL AUTO_INCREMENT FIRST,
-CHANGE `recipient_id` `recipient_id` int(11) unsigned NOT NULL DEFAULT '0' AFTER `recipient`,
-CHANGE `folder` `folder` int(11) unsigned NOT NULL DEFAULT '0' AFTER `date`,
-CHANGE `old` `old` tinyint(1) unsigned NOT NULL DEFAULT '0' AFTER `folder`;
-
-ALTER TABLE `usebb_pm_folders`
-CHANGE `id` `id` int(11) unsigned NOT NULL AUTO_INCREMENT FIRST,
-CHANGE `user_id` `user_id` int(11) unsigned NOT NULL AFTER `descr`;
 
 ALTER TABLE `usebb_sessions`
 CHANGE `user_id` `user_id` int(11) unsigned NOT NULL AFTER `sess_id`,

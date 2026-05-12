@@ -235,5 +235,3 @@ if ( $filled_in && !empty($_POST['confirm']) && !empty($_POST['dopruning']) && $
 }
 
 $admin_functions->create_body('prune_members', $content);
-
-?>

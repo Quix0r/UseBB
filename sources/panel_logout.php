@@ -99,9 +99,5 @@ if ( !$session->sess_info['user_id'] ) {
 		// Include the page footer
 		//
 		require(ROOT_PATH.'sources/page_foot.php');
-		
 	}
-	
 }
-
-?>

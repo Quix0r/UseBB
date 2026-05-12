@@ -758,5 +758,3 @@ class session {
 	}
 	
 }
-
-?>

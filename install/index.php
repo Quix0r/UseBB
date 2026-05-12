@@ -24,10 +24,11 @@
 */
 
 define('INCLUDED', true);
-define('ROOT_PATH', '../');
+define('ROOT_PATH', dirname(dirname(__FILE__)) . '/');
 
-if ( empty($_GET['step']) || intval($_GET['step']) < 2 )
+if ( empty($_GET['step']) || intval($_GET['step']) < 2 ) {
 	define('NO_DB', true);
+}
 
 define('IS_INSTALLER', true);
 
@@ -60,29 +61,22 @@ $out = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.
 ';
 
 if ( empty($_SESSION['installer_running']) && $functions->get_config('installer_run') ) {
-	
-	$out .= '		<p>This installer has been run already. To enable it again, delete the <code>installer_run</code> config value from <code>config.php</code>.</p>
-';
-	
+	$out .= '		<p>This installer has been run already. To enable it again, delete the <code>installer_run</code> config value from <code>config.php</code>.</p>';
 } elseif ( $_GET['step'] === 1 ) {
-	
-	foreach ( array('db_type', 'db_server', 'db_username', 'db_passwd', 'db_dbname', 'db_prefix', 'admin_username', 'admin_email', 'admin_passwd1', 'admin_passwd2') as $key )
+	foreach ( array('db_type', 'db_server', 'db_username', 'db_passwd', 'db_dbname', 'db_prefix', 'admin_username', 'admin_email', 'admin_passwd1', 'admin_passwd2') as $key ) {
 		$_POST[$key] = ( !empty($_POST[$key]) ) ? $_POST[$key] : '';
-	
+	}
+
 	$db_servers = ( version_compare(phpversion(), '5.0.0', '<') || !extension_loaded('mysqli') ) ? array('mysql' => 'MySQL') : array('mysqli' => 'MySQL 4.1/5.x &mdash; mysqli', 'mysql' => 'MySQL 3.x/4.0 &mdash; mysql');
-	
+
 	if ( !empty($_POST['start']) && !is_writable(ROOT_PATH.'config.php') && !empty($_SESSION['installer_running']) ) {
-		
 		$functions->redirect('index.php', array('step' => 2));
-		
 	} elseif ( !empty($_POST['db_type']) && array_key_exists($_POST['db_type'], $db_servers) && !empty($_POST['db_server']) && !empty($_POST['db_username']) && !empty($_POST['db_dbname']) && !empty($_POST['admin_username']) && preg_match(USER_PREG, $_POST['admin_username']) && !empty($_POST['admin_email']) && preg_match(EMAIL_PREG, $_POST['admin_email']) && !empty($_POST['admin_passwd1']) && !empty($_POST['admin_passwd2']) && $functions->validate_password(stripslashes($_POST['admin_passwd1']), true) && strlen(stripslashes($_POST['admin_passwd1'])) >= $functions->get_config('passwd_min_length') && $_POST['admin_passwd1'] == $_POST['admin_passwd2'] ) {
-		
 		$_SESSION['installer_running'] = 1;
-		
 		$_SESSION['admin_username'] = $_POST['admin_username'];
 		$_SESSION['admin_email'] = $_POST['admin_email'];
 		$_SESSION['admin_passwd'] = md5(stripslashes($_POST['admin_passwd1']));
-		
+
 		$admin_functions->set_config(array(
 			'type' => $_POST['db_type'],
 			'server' => $_POST['db_server'],
@@ -93,19 +87,14 @@ if ( empty($_SESSION['installer_running']) && $functions->get_config('installer_
 			'admin_email' => $_POST['admin_email'],
 			'installer_run' => 1
 		));
-		
-		if ( is_writable(ROOT_PATH.'config.php') )
+
+		if ( is_writable(ROOT_PATH.'config.php') ) {
 			$functions->redirect('index.php', array('step' => 2));
-		
+		}
 	} else {
-		
 		if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
-			
-			$out .= '		<p class="important"><strong>Important:</strong> some values were missing or filled in incorrectly. Please check them.</p>
-		
-		<p>Please fill in all the required fields below (marked with <small>*</small>). If you don\'t know what a field means or you don\'t know what to fill in, please ask your web hosting company for the right values.</p>
-';
-			
+			$out .= '		<p class="important"><strong>Important:</strong> some values were missing or filled in incorrectly. Please check them.</p>		
+		<p>Please fill in all the required fields below (marked with <small>*</small>). If you don\'t know what a field means or you don\'t know what to fill in, please ask your web hosting company for the right values.</p>';
 		} else {
 			
 			$config_warning = ( !is_writable(ROOT_PATH.'config.php') ) ? '<p class="important"><strong>Tip:</strong> <code>config.php</code> is at this moment not writable by the webserver. Therefore, you will be asked to download the file after filling in this form. If you would like UseBB to edit the file automatically, make <code>config.php</code> writable and <a href="index.php">refresh</a> this wizard.</p>' : '';
@@ -122,43 +111,33 @@ if ( empty($_SESSION['installer_running']) && $functions->get_config('installer_
 		
 		<p>You can also manually install UseBB. The instructions can be found in the <a href="../docs/index.html"><em>Readme</em> document</a>. Also, check the system requirements found in that file.</p>
 ';
-			
 		}
-		
+
 		$_POST['db_server'] = ( $_SERVER['REQUEST_METHOD'] == 'GET' ) ? 'localhost' : $_POST['db_server'];
 		$_POST['db_prefix'] = ( $_SERVER['REQUEST_METHOD'] == 'GET' ) ? 'usebb_' : $_POST['db_prefix'];
-		
+
 		if ( count($db_servers) > 1 ) {
-			
 			$db_server = '<select name="db_type">';
 			foreach ( $db_servers as $key => $val ) {
-				
 				$selected = ( $_POST['db_type'] == $key ) ? ' selected="selected"' : '';
 				$db_server .= '<option value="'.$key.'"'.$selected.'>'.$val.'</option>';
 				
 			}
+
 			$db_server .= '</select>';
-			
 		} else {
-			
 			$db_server = current($db_servers).' <input type="hidden" name="db_type" value="'.key($db_servers).'" />';
-			
 		}
-		
+
 		if ( is_writable(ROOT_PATH.'config.php') ) {
-			
 			$submit = '<p>Start the installation when you are sure everything is filled in correctly.</p>
 		<p id="submit"><input type="submit" value="Start installation" /></p>';
-			
 		} else {
-			
 			$submit = '<p>When you are sure everything is filled in correctly, click the button <em>Download config.php</em> to save the configuration file and upload it to your web space. When this is done, click <em>Start Installation</em>.</p>
 		<p id="submit"><input type="submit" value="Download config.php" /> <input type="submit" name="start" value="Start installation" /></p>';
-			
 		}
-		
-		$out .= '		
-		<table>
+
+		$out .= '		<table>
 			<tr>
 				<th colspan="2">Database configuration</th>
 			</tr>

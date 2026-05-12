@@ -150,5 +150,3 @@ if ( !isset($_SESSION['sqltoolbox_warned']) ) {
 }
 
 $admin_functions->create_body('sqltoolbox', $content);
-
-?>

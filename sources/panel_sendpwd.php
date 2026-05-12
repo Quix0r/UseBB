@@ -154,5 +154,3 @@ if ( !empty($_POST['user']) && !empty($_POST['email']) && preg_match(USER_PREG, 
 // Include the page footer
 //
 require(ROOT_PATH.'sources/page_foot.php');
-
-?>

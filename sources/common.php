@@ -344,5 +344,3 @@ $db->connect($dbs);
 // Start/continue session
 //
 $session->start();
-
-?>

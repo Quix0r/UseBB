@@ -187,5 +187,3 @@ if ( !empty($_GET['delete']) && valid_int($_GET['delete']) && $functions->verify
 }
 
 $admin_functions->create_body('bans', $content);
-
-?>

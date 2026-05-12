@@ -394,5 +394,3 @@ if ( !isset($_GET['act']) ) {
 	require(ROOT_PATH.'sources/page_foot.php');
 	
 }
-
-?>

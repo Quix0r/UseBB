@@ -379,36 +379,29 @@ if ( !empty($_GET['id']) && valid_int($_GET['id']) ) {
 	$content .= '</form>';
 	
 	if ( !empty($search_member) ) {
-		
 		$search_member_sql = preg_replace(array('#%#', '#_#', '#\s+#'), array('\%', '\_', ' '), $_POST['search_member']);
 		$result = $db->query("SELECT id, name, displayed_name, email FROM ".TABLE_PREFIX."members WHERE name LIKE '%".$search_member_sql."%' OR displayed_name LIKE '%".$search_member_sql."%' OR email LIKE '%".$search_member_sql."%' ORDER BY name ASC");
-		$matching_members = array();
-		while ( $memberdata = $db->fetch_result($result) )
+		$matching_members = [];
+
+		while ( $memberdata = $db->fetch_result($result) ) {
 			$matching_members[$memberdata['id']] = array(unhtml(stripslashes($memberdata['name'])), unhtml(stripslashes($memberdata['displayed_name'])), unhtml(stripslashes($memberdata['email'])));
-		
+		}
+
 		if ( count($matching_members) ) {
-			
 			$select = '<select name="id">';
-			foreach ( $matching_members as $key => $val )
+			foreach ( $matching_members as $key => $val ) {
 				$select .= '<option value="'.$key.'">'.$val[0].' ('.$val[1].' &mdash; '.$val[2].')</option>';
+			}
 			$select .= '</select>';
 			
 			$content .= '<form action="'.$functions->make_url('admin.php', array('act' => 'members')).'" method="get">';
 			$content .= '<fieldset><legend>'.$lang['MembersSearchMemberList'].'</legend><input type="hidden" name="act" value="members" />'.$select.' <input type="submit" value="'.$lang['Edit'].'" /></fieldset>';
 			$content .= '</form>';
-			
 		} else {
-			
 			$content .= '<p>'.sprintf($lang['MembersSearchMemberNotFound'], '<em>'.unhtml(stripslashes($_POST['search_member'])).'</em>').'</p>';
-			
 		}
-		
 	}
-	
 	$template->set_js_onload("set_focus('search_member')");
-	
 }
 
 $admin_functions->create_body('members', $content);
-
-?>

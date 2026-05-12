@@ -37,7 +37,7 @@
  */
  
 define('INCLUDED', true);
-define('ROOT_PATH', './');
+define('ROOT_PATH', dirname(__FILE__) . '/');
  
 //
 // Don't use gzip for the feed
@@ -127,45 +127,40 @@ if ( !empty($_GET['forum']) && valid_int($_GET['forum']) ) {
 	//
 	// Forum is not accessible
 	//
-	if ( !$functions->auth($forumdata['auth'], 'view', $_GET['forum']) )
+	if ( !$functions->auth($forumdata['auth'], 'view', $_GET['forum']) ) {
 		usebb_rss_error(403);
-	
+	}
+
 	$forum_name = unhtml(stripslashes($forumdata['name']), true);
 	$forum_link = $functions->get_config('board_url').$functions->make_url('forum.php', array('id' => $_GET['forum']), true, false);
-	
+
 	$header_vars = array(
-		
 		'board_name' => unhtml($functions->get_config('board_name').': '.stripslashes($forumdata['name']), true),
 		// Stripping tags, Firefox doesn't show the description when it has tags.
 		'board_descr' => named_entities_to_numeric(strip_tags(stripslashes($forumdata['descr']))),
 		'board_url' => $forum_link,
 		'pubDate' => $pubDate,
 		'link_rss' => $functions->get_config('board_url').$functions->make_url('rss.php', array('forum' => $_GET['forum']), true, false),
-		
 	);
-	
+
 	$template->parse('header', 'rss', $header_vars, true);
-	
+
 	//
 	// Get the topics
 	//
 
 	if ( $functions->auth($forumdata['auth'], 'read', $_GET['forum']) ) {
-		
 		$can_read = true;
 		$add_to_query = array("p.content", "p.enable_bbcode", "p.enable_smilies", "p.enable_html", "m.level AS poster_level", "m.active");
-		
 	} else {
-		
 		$can_read = false;
 		$add_to_query = array();
-		
 	}
 
 	$add_to_query = count($add_to_query) ? ', '.implode(', ', $add_to_query) : '';
-	
+
 	$result = $db->query("SELECT t.id, t.topic_title, p.poster_id, p.poster_guest, p.post_time, m.displayed_name".$add_to_query." FROM ".TABLE_PREFIX."topics t LEFT JOIN ".TABLE_PREFIX."posts p ON t.first_post_id = p.id LEFT JOIN ".TABLE_PREFIX."members m ON p.poster_id = m.id WHERE t.forum_id = ".$_GET['forum']." ORDER BY p.post_time DESC LIMIT ".$functions->get_config('rss_items_count'));
-	
+
 	while ( $topicdata = $db->fetch_result($result) ) {
 		
 		$link = $functions->get_config('board_url').$functions->make_url('topic.php', array('id' => $topicdata['id']), true, false);
@@ -316,7 +311,7 @@ if ( !empty($_GET['forum']) && valid_int($_GET['forum']) ) {
 		'board_descr' => unhtml($functions->get_config('board_descr'), true),
 		'board_url' => $functions->get_config('board_url'),
 		'pubDate' => $pubDate,
-		'link_rss' => $functions->get_config('board_url').$functions->make_url('rss.php', null, true, false),
+		'link_rss' => $functions->get_config('board_url').$functions->make_url('rss.php', [], true, false),
 		
 	);
 	

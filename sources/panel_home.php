@@ -108,5 +108,3 @@ if ( count($_COOKIE) >= 1 && isset($_GET['al']) && valid_int($_GET['al']) && $fu
 	));
 	
 }
-
-?>
