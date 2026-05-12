@@ -331,13 +331,13 @@ if ( !$topicdata['id'] ) {
 					'view_more_posts' => $view_more_posts
 				));
 				
-				$colornum = 1;				
+				$colornum = 1;
 				while ( $postsdata = $db->fetch_result($result) ) {
 					
 					$template->parse('post', 'topicreview', array(
 						'poster_name' => ( !empty($postsdata['poster_id']) ) ? unhtml(stripslashes($postsdata['displayed_name'])) : unhtml(stripslashes($postsdata['poster_guest'])),
 						'post_date' => $functions->make_date($postsdata['post_time']),
-						'post_content' => $functions->markup($functions->replace_badwords(stripslashes($postsdata['content'])), $postsdata['enable_bbcode'], $postsdata['enable_smilies'], $postsdata['enable_html'], NULL, $functions->antispam_can_post_links($postsdata)),
+						'post_content' => $functions->markup($functions->replace_badwords(stripslashes($postsdata['content'])), $postsdata['enable_bbcode'], $postsdata['enable_smilies'], boolval($postsdata['enable_html']), false, $functions->antispam_can_post_links($postsdata)),
 						'colornum' => $colornum
 					));
 					$colornum = ( $colornum !== 1 ) ? 1 : 2;

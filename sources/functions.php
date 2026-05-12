@@ -48,7 +48,7 @@ if ( !defined('INCLUDED') )
  *
  * Takes variable number of arguments that get printed out to template.
  */
-function usebb_debug_output() {
+function usebb_debug_output(): void {
 	
 	global $template;
 
@@ -68,21 +68,16 @@ function usebb_debug_output() {
  * Will add slashes to and trim the value.
  * Third parameter disables addslashes (magic_quotes_gpc on)
  */
-function usebb_clean_input_value(&$value, $key, $mq=false) {
-	
+function usebb_clean_input_value(mixed &$value, string $key, bool $mq=false): void {
 	if ( is_array($value) ) {
-		
 		array_walk($value, 'usebb_clean_input_value', $mq);
-		
 	} else {
-		
-		if ( !$mq && !empty($value) )
+		if ( !$mq && !empty($value) ) {
 			$value = addslashes($value);
-		
-		$value = trim($value);
-		
-	}
+		}
 
+		$value = trim($value);
+	}
 }
 
 /**
@@ -90,7 +85,7 @@ function usebb_clean_input_value(&$value, $key, $mq=false) {
  *
  * Will add slashes to the value.
  */
-function usebb_clean_db_value(&$value, $key) {
+function usebb_clean_db_value(mixed &$value, string $key): void {
 	
 	if ( is_array($value) ) {
 		array_walk($value, 'usebb_clean_db_value');
@@ -106,7 +101,7 @@ function usebb_clean_db_value(&$value, $key) {
  * @param bool $num_only Look for &#...; only
  * @return bool Contains entities
  */
-function contains_entities($string, $num_only=false) {
+function contains_entities(string $string, bool $num_only=false): bool {
 	
 	return preg_match(( $num_only ? '#&\#[^;]+;#' : '#&\#?[^;]+;#' ), $string);
 	
@@ -121,7 +116,7 @@ function contains_entities($string, $num_only=false) {
  * @param string $string String
  * @return string String
  */
-function named_entities_to_numeric($string) {
+function named_entities_to_numeric(string $string): string {
 	
   $table = array(
     "&nbsp;"     => "&#160;",
@@ -374,8 +369,7 @@ function named_entities_to_numeric($string) {
     "&euro;"     => "&#8364;",
   );
 
-  return strtr($string, $table);
-
+	return strtr($string, $table);
 }
 
 /**
@@ -428,27 +422,24 @@ function entities_strlen(string $string): int {
  * @param int $length Length of new string
  * @return string Trimmed string
  */
-function entities_rtrim($string, $length) {
+function entities_rtrim(string $string, int $length): string {
 	
 	if ( function_exists('mb_language') && mb_language() != 'neutral') {
-		
 		$strlen = 'mb_strlen';
 		$substr = 'mb_substr';
-		
 	} else {
-		
 		$strlen = 'strlen';
 		$substr = 'substr';
-		
 	}
-	
-	if ( strpos($string, '&') === false )
+
+	if ( strpos($string, '&') === false ) {
 		return $substr($string, 0, $length);
-	
+	}
+
 	$new_string = '';
 	$new_length = $pos = 0;
 	$entity_open = false;
-	
+
 	while ( $pos < $strlen($string) && ( $new_length < $length || $entity_open ) ) {
 		
 		$char = $substr($string, $pos, 1);
@@ -568,14 +559,10 @@ class functions {
 	private $is_mbstring;
 	private $date_format_from_db = FALSE;
 	/**#@-*/
-	
-	/**
-	 * @access private
-	 */
-	function usebb_die($errno, $error, $file, $line) {
-		
+
+	public function usebb_die(int $errno, string $error, string $file, string $line) {
 		global $db, $dbs, $template, $session;
-		
+
 		//
 		// Ignore the ones we don't want
 		//
@@ -773,7 +760,7 @@ class functions {
 	 * @param bool $original Use original config.php configuration
 	 * @return mixed Value of setting
 	 */
-	function get_config(string $setting, bool $original=false): mixed {
+	public function get_config(string $setting, bool $original=false): mixed {
 		
 		global $session;
 
@@ -968,7 +955,7 @@ class functions {
 	 * @param string $stat Statistical value to retrieve
 	 * @return mixed Statistical value
 	 */
-	function get_stats(string $stat): mixed {
+	public function get_stats(string $stat): mixed {
 		
 		global $db;
 		
@@ -1035,7 +1022,7 @@ class functions {
 	 * @param bool $add Add to current value or not
 	 * @return void
 	 */
-	function set_stats(string $stat, mixed $value, bool $add=false): void {
+	public function set_stats(string $stat, mixed $value, bool $add=false): void {
 		global $db;
 
 		if ( $add ) {
@@ -1053,16 +1040,18 @@ class functions {
 	 * @param array $vars GET variabeles
 	 * @return string URL
 	 */
-	function _make_friendly_url(string $filename, array $vars): string {
+	public function _make_friendly_url(string $filename, array $vars): string {
 		
-		if ( $filename == 'index' && count($vars) == 0 )
+		if ( $filename == 'index' && count($vars) == 0 ) {
 			return './';
+		}
 
 		$url = $filename;
 		$keyed = array('forum', 'topic', 'post', 'quotepost', 'al');
 
-		foreach ( $vars as $key => $val )
+		foreach ( $vars as $key => $val ) {
 			$url .= '-' . urlencode(( in_array($key, $keyed) ) ? $key . $val : $val);
+		}
 
 		$url .= ( $filename == 'rss' ) ? '.xml' : '.html';
 
@@ -1081,10 +1070,9 @@ class functions {
 	 * @param bool $enable_token Enable token (forces .php link)
 	 * @return string URL
 	 */
-	function make_url(string $filename, array $vars=[], bool $html=true, bool $enable_sid=true, bool $force_php=false, bool $enable_token=false): string {
-		
+	public function make_url(string $filename, array $vars=[], bool $html=true, bool $enable_sid=true, bool $force_php=false, bool $enable_token=false): string {
 		global $session;
-		
+
 		//
 		// Base name
 		//
@@ -1093,10 +1081,11 @@ class functions {
 		//
 		// Don't keep session key variable
 		//
-		if ( is_array($vars) )
+		if ( is_array($vars) ) {
 			unset($vars[$this->get_config('session_name').'_sid']);
-		else
+		} else {
 			$vars = [];
+		}
 
 		//
 		// No session IDs for search engines
@@ -1111,13 +1100,13 @@ class functions {
 		//
 		// Friendly URLs
 		//
-		if ( !$force_php && $this->get_config('friendly_urls') )
+		if ( !$force_php && $this->get_config('friendly_urls') ) {
 			return $this->_make_friendly_url($filename, $vars);
+		}
 
 		//
 		// Build URL
 		//
-
 		$url = $filename . '.php';
 
 		//
@@ -1125,26 +1114,27 @@ class functions {
 		//
 		$SID = SID;
 		if ( !empty($SID) && $enable_sid && ( !$html || !ini_get('session.use_trans_sid') ) ) {
-			
 			$SID_parts = explode('=', $SID, 2);
 			$vars[$SID_parts[0]] = $SID_parts[1];
-
 		}
 
 		//
 		// Add token
 		//
-		if ( $enable_token )
+		if ( $enable_token ) {
 			$vars['_url_token_'] = $this->generate_token();
+		}
 
-		if ( count($vars) == 0 )
+		if ( count($vars) == 0 ) {
 			return $url;
+		}
 
 		$url .= '?';
 		$delim = ( $html ) ? '&amp;' : '&';
 
-		foreach ( $vars as $key => $val )
+		foreach ( $vars as $key => $val ) {
 			$url .= urlencode($key) . '=' . urlencode($val) . $delim;
+		}
 
 		return substr($url, 0, - strlen($delim));
 		
@@ -1156,16 +1146,17 @@ class functions {
 	 * @param string $url URL
 	 * @return string URL
 	 */
-	function attach_sid(string $url): string {
-		
+	public function attach_sid(string $url): string {
 		$SID = SID;
-		
-		if ( empty($SID) || $this->get_config('friendly_urls') || preg_match('/'.preg_quote($SID, '/').'$/', $url) )
+
+		if ( empty($SID) || $this->get_config('friendly_urls') || preg_match('/'.preg_quote($SID, '/').'$/', $url) ) {
 			return $url;
-		
-		if ( strpos($url, '?') !== false )
+		}
+
+		if ( strpos($url, '?') !== false ) {
 			return $url . '&' . $SID;
-		
+		}
+
 		return $url . '?' . $SID;
 
 	}
@@ -1177,64 +1168,58 @@ class functions {
 	 * @param string $section Section name (main section is used when missing)
 	 * @return array Language variables
 	 */
-	function fetch_language(string $language='', string $section=''): array {
+	public function fetch_language(string $language='', string $section=''): array {
 		
 		$language = ( !empty($language) && in_array($language, $this->get_language_packs()) ) ? $language : $this->get_config('language');
 		$section = ( !empty($section) ) ? $section : 'lang';
 		
 		if ( !isset($this->language_sections[$language]) || !in_array($section, $this->language_sections[$language]) ) {
-			
 			//
 			// Not loaded yet
 			//
-
 			if ( $section != 'lang' ) {
-				
 				//
 				// Add to current $lang
 				//
 				$lang = $GLOBALS['lang'];
 
 				if ( !file_exists(ROOT_PATH.'languages/'.$section.'_'.$language.'.php') ) {
-					
 					//
 					// Fallback to English
 					//
-					if ( $language != 'English' && in_array('English', $this->get_language_packs()) )
+					if ( $language != 'English' && in_array('English', $this->get_language_packs()) ) {
 						require(ROOT_PATH.'languages/'.$section.'_English.php');
-					else
+					} else {
 						trigger_error('Section "'.$section.'" for language pack "'.$language.'" could not be found. No English fallback was available. Please use an updated language pack or also upload the English one.', E_USER_ERROR);
-					
+					}
 				} else {
-					
 					require(ROOT_PATH.'languages/'.$section.'_'.$language.'.php');
-					
+
 					//
 					// Merge with English for missing strings
 					//
-					if ( $language != 'English' && in_array('English', $this->get_language_packs()) )
+					if ( $language != 'English' && in_array('English', $this->get_language_packs()) ) {
 						$lang = array_merge($this->fetch_language('English', $section), $lang);
-					
+					}
 				}
-				
 			} else {
-				
 				require(ROOT_PATH.'languages/'.$section.'_'.$language.'.php');
-				
+
 				//
 				// Merge with English for missing strings
 				//
-				if ( $language != 'English' && in_array('English', $this->get_language_packs()) )
+				if ( $language != 'English' && in_array('English', $this->get_language_packs()) ) {
 					$lang = array_merge($this->fetch_language('English', $section), $lang);
-				
-				if ( empty($lang['character_encoding']) )
+				}
+
+				if ( empty($lang['character_encoding']) ) {
 					$lang['character_encoding'] = 'iso-8859-1';
-				
+				}
+
 				//
 				// UTF-8 patching
 				//
 				if ( function_exists('mb_internal_encoding') ) {
-					
 					// Setting mbstring
 					$mb_internal_encoding = ( $lang['character_encoding'] == 'iso-8859-8-i' ) ? 'iso-8859-8' : $lang['character_encoding'];
 
@@ -1242,15 +1227,11 @@ class functions {
 					$is_mb_internal_encoding = mb_internal_encoding($mb_internal_encoding);
 					
 					if ( $is_mb_language !== FALSE || $is_mb_internal_encoding !== FALSE ) {
-						
 						$this->is_mbstring = TRUE;
-						
 					} else {
-						 
 						// mbstring can not be used, reset
 						mb_language('neutral');
 						mb_internal_encoding('ISO-8859-1');
-						
 					}
 
 					// Reset other parameters
@@ -1259,26 +1240,25 @@ class functions {
 					ini_set('mbstring.func_overload', 0);
 					ini_set('mbstring.substitute_character', 'none');
 				}
-				
 			}
-			
+
 			$this->languages[$language] = $lang;
 		}
-		
+
 		if ( !isset($this->language_sections[$language]) ) {
 			$this->language_sections[$language] = [];
 		}
+
 		$this->language_sections[$language][] = $section;
-		
+
 		$returned = &$this->languages[$language];
 		return $returned;
-		
 	}
-	
+
 	/**
 	 * Kick a user to the login form
 	 */
-	function redir_to_login(): void {
+	public function redir_to_login(): void {
 		
 		global $session, $template, $lang;
 		
@@ -1310,7 +1290,7 @@ class functions {
 	 * @param bool $translate Localize dates
 	 * @return string Date
 	 */
-	function make_date(int $stamp, string $format='', bool $keep_gmt=false, bool $translate=true): string {
+	public function make_date(int $stamp, string $format='', bool $keep_gmt=false, bool $translate=true): string {
 		
 		global $lang;
 		
@@ -1338,7 +1318,7 @@ class functions {
 	 * @param int $until Calculate time past until this Unix timestamp (current is used when missing)
 	 * @return string Time past
 	 */
-	function time_past(int $timestamp, ?int $until=null): string {
+	public function time_past(int $timestamp, ?int $until=null): string {
 	
 		global $lang;
 	
@@ -1378,7 +1358,7 @@ class functions {
 	 * @param array $user User information containing id, email and email_show
 	 * @return string HTML
 	 */
-	function show_email(array $user): string {
+	public function show_email(array $user): string {
 		
 		global $session, $lang;
 		
@@ -1441,7 +1421,7 @@ class functions {
 	 * @param string $string String to convert
 	 * @return string Converted string
 	 */
-	function string_to_entities(string $string): string {
+	public function string_to_entities(string $string): string {
 		
 		$length = strlen($string);
 		$new_string = '';
@@ -1458,7 +1438,7 @@ class functions {
 	 * @param bool $is_password Is the random key used as a password?
 	 * @return string Random key
 	 */
-	function random_key(bool $is_password=false): string {
+	public function random_key(bool $is_password=false): string {
 		
 		if ( !$is_password )
 			return md5(mt_rand());
@@ -1498,7 +1478,7 @@ class functions {
 	 * @param string $language Language name the e-mail is in (default language when missing)
 	 * @param string $charset Character set the e-mail is in (default charset when missing)
 	 */
-	function usebb_mail(string $subject, string $rawbody, array $bodyvars, string $from_name, string $from_email, string $to, string $bcc_email='', string $language='', string $charset='') {
+	public function usebb_mail(string $subject, string $rawbody, array $bodyvars, string $from_name, string $from_email, string $to, string $bcc_email='', string $language='', string $charset='') {
 		
 		global $lang;
 		
@@ -1625,55 +1605,50 @@ class functions {
 	 * @param int $user_id User ID
 	 * @param string $passwd_hash Password hash
 	 */
-	function set_al($user_id, $passwd_hash) {
-		
+	public function set_al(int $user_id, string $passwd_hash): void {
 		$content = array(
 			intval($user_id),
 			$passwd_hash
 		);
+
 		$this->setcookie($this->get_config('session_name').'_al', serialize($content), time()+31536000);
-		
 	}
-	
+
 	/**
 	 * Unset the remember cookie
 	 */
-	function unset_al() {
-		
+	public function unset_al(): void {
 		$this->setcookie($this->get_config('session_name').'_al', '');
-		
 	}
-	
+
 	/**
 	 * Is the remember cookie set?
 	 *
 	 * @return bool Remember cookie set
 	 */
-	function isset_al() {
-		
+	public function isset_al(): bool {
 		$cookie_name = $this->get_config('session_name').'_al';
 
-		if ( empty($_COOKIE[$cookie_name]) )
+		if ( empty($_COOKIE[$cookie_name]) ) {
 			return FALSE;
+		}
 
 		$value = stripslashes($_COOKIE[$cookie_name]);
 
 		return ( preg_match('/^a:2:\{i:0;i:[0-9]+;i:1;s:32:"[a-z0-9]{32}";\}$/', $value) === 1 );
-		
 	}
-	
+
 	/**
 	 * Get the remember cookie's value
 	 *
 	 * @return mixed Array with user ID and password hash -or- false when not set
 	 */
-	function get_al() {
-		
-		if ( !$this->isset_al() )
+	public function get_al(): mixed {
+		if ( !$this->isset_al() ) {
 			return FALSE;
-			
+		}
+
 		return unserialize(stripslashes($_COOKIE[$this->get_config('session_name').'_al']));
-		
 	}
 	
 	/**
@@ -1681,18 +1656,18 @@ class functions {
 	 *
 	 * @return int User level
 	 */
-	function get_user_level() {
-		
+	public function get_user_level(): ?int {
 		global $session;
-		
-		if ( !isset($session->sess_info['user_id']) )
+
+		if ( !isset($session->sess_info['user_id']) ) {
 			trigger_error('You first need to call $session->update() before you can get any session info.', E_USER_ERROR);
-		
-		if ( $session->sess_info['user_id'] )
+		}
+
+		if ( $session->sess_info['user_id'] ) {
 			return $session->sess_info['user_info']['level'];
-		else
+		} else {
 			return LEVEL_GUEST;
-		
+		}
 	}
 	
 	/**
@@ -1707,57 +1682,50 @@ class functions {
 	 * @param array $alternative_user_info When not for own account, array with user information
 	 * @return bool Allowed
 	 */
-	function auth($auth_int, $action, $forum_id, $self=true, $alternative_user_info=null) {
-		
+	public function auth(string $auth_int, string $action, int $forum_id, bool $self=true, ?array $alternative_user_info=null): bool {
 		global $session, $db;
-		
-		if ( $self )
+
+		if ( $self ) {
 			$user_info = ( $session->sess_info['user_id'] ) ? $session->sess_info['user_info'] : array('id' => LEVEL_GUEST, 'level' => LEVEL_GUEST);
-		else
+		} else {
 			$user_info = $alternative_user_info;
-		
-		if ( ( $self && $session->sess_info['ip_banned'] ) || ( $this->get_config('board_closed') && $user_info['level'] < LEVEL_ADMIN ) )
+		}
+
+		if ( ( $self && $session->sess_info['ip_banned'] ) || ( $this->get_config('board_closed') && $user_info['level'] < LEVEL_ADMIN ) ) {
 			return false;
-		
+		}
+
 		//
 		// Define the user level
 		//
 		if ( $user_info['id'] ) {
-			
 			//
 			// Logged in user
 			//
 			if ( $user_info['level'] == LEVEL_MOD ) {
-				
 				if ( !is_array($this->mod_auth) ) {
-					
 					$result = $db->query("SELECT forum_id FROM ".TABLE_PREFIX."moderators WHERE user_id = ".$user_info['id']);
 					$this->mod_auth = [];
-					while ( $out = $db->fetch_result($result) )
+					while ( $out = $db->fetch_result($result) ) {
 						$this->mod_auth[] = intval($out['forum_id']);
-					
+					}
 				}
-				
+
 				$userlevel = ( in_array($forum_id, $this->mod_auth) ) ? LEVEL_MOD : LEVEL_MEMBER;
-				
 			} else {
-				
 				$userlevel = $user_info['level'];
-				
 			}
-			
 		} else {
-			
 			//
 			// Guest
 			//
-			if ( !$this->get_config('guests_can_access_board') )
+			if ( !$this->get_config('guests_can_access_board') ) {
 				return false;
-			else
+			} else {
 				$userlevel = LEVEL_GUEST;
-			
+			}
 		}
-		
+
 		//
 		// Get the part of the auth integer that
 		// corresponds with the action given
@@ -1774,17 +1742,14 @@ class functions {
 			'sticky' => 8,
 			'html' => 9
 		);
+
 		$min_level = intval($auth_int[$actions[$action]]);
-		
+
 		//
 		// If the user level is equal or greater than the
 		// auth integer, return a true, otherwise return a false.
 		//
-		if ( $userlevel >= $min_level )
-			return true;
-		else
-			return false;
-		
+		return ( $userlevel >= $min_level );
 	}
 	
 	/**
@@ -1794,7 +1759,7 @@ class functions {
 	 * @param array $listarray Array with all moderators (automatically requested when missing)
 	 * @return string Moderator list
 	 */
-	function get_mods_list($forum, $listarray=false) {
+	public function get_mods_list(int $forum, array $listarray=[]): string {
 		
 		global $db, $lang;
 		
