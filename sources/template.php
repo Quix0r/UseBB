@@ -541,8 +541,8 @@ class template {
 			'character_encoding' => $this->character_encoding,
 			'language_code' => ( !empty($lang['language_code']) ) ? $lang['language_code'] : 'en',
 			'text_direction' => ( !empty($lang['text_direction']) ) ? $lang['text_direction'] : 'ltr',
-			'img_dir' => ROOT_PATH.'templates/'.$functions->get_config('template').'/gfx/',
-			'css_url' => ROOT_PATH.'templates/'.$functions->get_config('template').'/styles.css',
+			'img_dir' => $functions->get_config('board_url').'templates/'.$functions->get_config('template').'/gfx/',
+			'css_url' => $functions->get_config('board_url').'templates/'.$functions->get_config('template').'/styles.css',
 			'acp_css_head_link' => ( !defined('IS_INSTALLER') && $session->sess_info['location'] == 'admin' ) ? '<link rel="stylesheet" type="text/css" href="'.ROOT_PATH.'templates/'.$functions->get_config('template').'/admin.css" />' : '',
 			'js_onload' => ( count($this->js_onload) ) ? ' onload="javascript:'.join(';', $this->js_onload).'"' : '',
 			'more_css_classes' => '',
@@ -552,25 +552,21 @@ class template {
 		// Parse all templates
 		//
 		foreach ( $this->requests as $request ) {
-			
 			if ( isset($request['raw']) ) {
-				
 				$body .= "\n".$this->raw_contents[$request['num']]."\n";
 				continue;
-				
 			}
-			
-			$finds = $replaces = array();			
+
+			$finds = $replaces = array();
 			foreach ( $request['variables'] as $key => $val ) {
-				
 				$finds[] = '{'.$key.'}';
 				$replaces[] = str_replace(array('{', '}', '$'), array('&#123;', '&#125;', '&#36;'), $val);
-				
 			}
+
 			$current_template = $this->templates[$request['section']][$request['template_name']];
 			$body .= str_replace($finds, $replaces, $current_template);
-			
 		}
+
 		unset($current_template);
 		
 		//
