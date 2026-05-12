@@ -30,6 +30,10 @@ if ( empty($_GET['step']) || intval($_GET['step']) < 2 ) {
 	define('NO_DB', true);
 }
 
+if ( file_exists(ROOT_PATH . 'config.php') ) {
+	die('Already installed!');
+}
+
 define('IS_INSTALLER', true);
 
 //
