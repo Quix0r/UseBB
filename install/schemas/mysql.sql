@@ -113,7 +113,9 @@ CREATE TABLE usebb_members (
   icq varchar(255) NOT NULL default '',
   jabber varchar(255) NOT NULL default '',
   skype varchar(255) NOT NULL default '',
-  PRIMARY KEY  (id)
+  PRIMARY KEY  (id),
+  UNIQUE `email` (`email`)
+  UNIQUE `name` (`name`)
 ) ENGINE=InnoDB;
 
 ----------------------------------------------------------
