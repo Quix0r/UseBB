@@ -32,7 +32,7 @@ if ( !defined('INCLUDED') )
 //
 // Initialize a new faq holder array
 //
-$faq = array();
+$faq = [];
 
 //
 // Define headings and questions

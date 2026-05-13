@@ -42,7 +42,7 @@ define('ROOT_PATH', dirname(__FILE__) . '/');
 //
 // Include usebb engine
 //
-require(ROOT_PATH.'sources/common.php');
+require ROOT_PATH.'sources/common.php';
 
 //
 // If an ID has been passed
@@ -57,7 +57,7 @@ if ( !empty($_GET['id']) && valid_int($_GET['id']) ) {
 	//
 	// Include the page header
 	//
-	require(ROOT_PATH.'sources/page_head.php');
+	require ROOT_PATH.'sources/page_head.php';
 	
 	if ( !$functions->get_config('guests_can_view_profiles') && $session->sess_info['user_id'] == LEVEL_GUEST ) {
 		
@@ -243,17 +243,14 @@ if ( !empty($_GET['id']) && valid_int($_GET['id']) ) {
 		}
 		
 	}
-	
+
 	//
 	// Include the page footer
 	//
-	require(ROOT_PATH.'sources/page_foot.php');
-	
+	require ROOT_PATH.'sources/page_foot.php';
 } else {
-	
 	//
 	// There's no user ID! Get us back to the index...
 	//
 	$functions->redirect('index.php');
-	
 }

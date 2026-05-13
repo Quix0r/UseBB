@@ -238,7 +238,7 @@ if ( defined('RUN_MODULE') ) {
 
 			}
 
-			$_SESSION['resync_stats'] = ( isset($_SESSION['resync_stats']) && is_array($_SESSION['resync_stats']) ) ? $_SESSION['resync_stats'] : array();
+			$_SESSION['resync_stats'] = ( isset($_SESSION['resync_stats']) && is_array($_SESSION['resync_stats']) ) ? $_SESSION['resync_stats'] : [];
 			$stages = array(
 				'topic_counts' => array('Topic counts', 'Number of posts per topic.'),
 				'topic_posts' => array('Topic posts', 'First and last post IDs.'),

@@ -91,38 +91,31 @@ if ( !empty($_GET['id']) && valid_int($_GET['id']) ) {
 			$content .= '<li>'.$lang['ActivateMembersList'.ucfirst($mode)].'</li> ';
 			
 		} else {
-			
 			$content .= '<li><a href="'.$functions->make_url('admin.php', array('act' => 'activate_members', 'show' => $mode)).'">'.$lang['ActivateMembersList'.ucfirst($mode)].'</a></li> ';
-			
 		}
-		
 	}
+
 	$content .= '</ul>';
-	
+
 	$result = $db->query("SELECT id, name, regdate, last_login, email FROM ".TABLE_PREFIX."members WHERE ".$query_where_part." ORDER BY regdate ASC");
-	$unactivated = array();
-	while ( $userinfo = $db->fetch_result($result) )
+
+	$unactivated = [];
+
+	while ( $userinfo = $db->fetch_result($result) ) {
 		$unactivated[] = $userinfo;
-	
+	}
+
 	if ( count($unactivated) ) {
-		
 		$content .= '<table id="adminregulartable"><tr><th>'.$lang['Username'].'</th><th>'.$lang['Registered'].'</th><th class="action">'.$lang['Activate'].'</th><th class="action">'.$lang['Edit'].'</th><th>'.$lang['Delete'].'</th></tr>';
 		foreach ( $unactivated as $userinfo ) {
-			
 			$logged_in_previously = ( $userinfo['last_login'] ) ? ' <small>*</small>' : '';
 			$content .= '<tr><td><a href="'.$functions->make_url('profile.php', array('id' => $userinfo['id'])).'" title="'.$userinfo['email'].'"><em>'.unhtml(stripslashes($userinfo['name'])).'</em></a>'.$logged_in_previously.'</td><td>'.$functions->make_date($userinfo['regdate']).'</td><td class="action"><a href="'.$functions->make_url('admin.php', array('act' => 'activate_members', 'show' => $_GET['show'], 'id' => $userinfo['id']), true, true, false, true).'">'.$lang['Activate'].'</a></td><td class="action"><a href="'.$functions->make_url('admin.php', array('act' => 'members', 'id' => $userinfo['id'])).'">'.$lang['Edit'].'</a></td><td class="action"><a href="'.$functions->make_url('admin.php', array('act' => 'delete_members', 'id' => $userinfo['id'])).'">'.$lang['Delete'].'</a></td></tr>';
-			
 		}
+
 		$content .= '</table>';
-		
 	} else {
-		
 		$content .= '<p>'.$lang['ActivateMembersNoMembers'].'</p>';
-		
 	}
-	
 }
 
 $admin_functions->create_body('activate_members', $content);
-
-?>

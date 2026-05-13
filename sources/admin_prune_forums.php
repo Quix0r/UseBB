@@ -203,5 +203,3 @@ if ( count($_POST['forums']) && !empty($_POST['action']) && ( $_POST['action'] =
 }
 
 $admin_functions->create_body('prune_forums', $content);
-
-?>

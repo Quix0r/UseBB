@@ -73,14 +73,14 @@ class template {
 	/**#@+
 	 * @access private
 	 */
-	var $loaded_sections = array();
-	var $templates = array();
-	var $requests = array();
-	var $global_vars = array();
-	var $raw_contents = array();
-	var $js_onload = array();
-	var $breadcrumbs = array();
-	var $config_debug = true;
+	private $loaded_sections = [];
+	private $templates = [];
+	private $requests = [];
+	private $global_vars = [];
+	private $raw_contents = [];
+	private $js_onload = [];
+	private $breadcrumbs = [];
+	private $config_debug = true;
 	/**#@-*/
 	
 	/**
@@ -158,7 +158,7 @@ class template {
 	 * @param bool $is_special Mark as a special template
 	 * @param bool $enable_token Enable token
 	 */
-	function parse($name, $section, $variables=array(), $is_special=false, $enable_token=false) {
+	function parse($name, $section, $variables=[], $is_special=false, $enable_token=false) {
 		
 		global $functions;
 		
@@ -177,7 +177,7 @@ class template {
 			
 		}
 
-		$variables = ( is_array($variables) && count($variables) ) ? $variables : array();
+		$variables = ( is_array($variables) && count($variables) ) ? $variables : [];
 
 		if ( $enable_token )
 			$this->install_token($variables);
@@ -247,7 +247,7 @@ class template {
 	 */
 	function clear_breadcrumbs() {
 
-		$this->breadcrumbs = array();
+		$this->breadcrumbs = [];
 
 	}
 
@@ -325,7 +325,7 @@ class template {
 	 */
 	function compress_sourcecode($string) {
 		
-		$matches = array();
+		$matches = [];
 		preg_match_all("#<textarea.*?>(.*?)</textarea>#is", $string, $matches[0]);
 		preg_match_all("#<pre.*?>(.*?)</pre>#is", $string, $matches[1]);
 		preg_match_all("#<script.*?>(.*?)</script>#is", $string, $matches[2]);
@@ -376,8 +376,8 @@ class template {
 			));
 			$breadcrumbs_last_index++;
 			
-			$breadcrumbs_butfirst = array();
-			$breadcrumbs_butlast = array();
+			$breadcrumbs_butfirst = [];
+			$breadcrumbs_butlast = [];
 
 			for ( $i = 0; $i <= $breadcrumbs_last_index; $i++ ) {
 
@@ -489,7 +489,7 @@ class template {
 			$timer_end = (float)$timer_end[1] + (float)$timer_end[0];
 			$parsetime = round($timer_end - TIMER_BEGIN, 4);
 			
-			$debug_info = array();
+			$debug_info = [];
 			$debug_info[] = $lang['ParseTime'].': '.$parsetime.' s';
 			if ( function_exists('memory_get_peak_usage') )
 				$debug_info[] = $lang['MemoryUsage'].': '.sprintf('%.2f', (memory_get_peak_usage() / 1024 / 1024)).' '.$lang['MegaByteShort'];
@@ -557,7 +557,7 @@ class template {
 				continue;
 			}
 
-			$finds = $replaces = array();
+			$finds = $replaces = [];
 			foreach ( $request['variables'] as $key => $val ) {
 				$finds[] = '{'.$key.'}';
 				$replaces[] = str_replace(array('{', '}', '$'), array('&#123;', '&#125;', '&#36;'), $val);
@@ -572,7 +572,7 @@ class template {
 		//
 		// Parse global and language variables
 		//
-		$finds = $replaces = array();
+		$finds = $replaces = [];
 		foreach ( $this->global_vars as $key => $val ) {
 			
 			$finds[] = '{'.$key.'}';

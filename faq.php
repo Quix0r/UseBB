@@ -42,7 +42,7 @@ define('ROOT_PATH', dirname(__FILE__) . '/');
 //
 // Include usebb engine
 //
-require(ROOT_PATH.'sources/common.php');
+require ROOT_PATH.'sources/common.php';
 
 //
 // Update and get the session information
@@ -52,7 +52,7 @@ $session->update('faq');
 //
 // Include the page header
 //
-require(ROOT_PATH.'sources/page_head.php');
+require ROOT_PATH.'sources/page_head.php';
 
 $template->add_breadcrumb($lang['FAQ'], array('faq.php'));
 
@@ -60,26 +60,25 @@ $template->add_breadcrumb($lang['FAQ'], array('faq.php'));
 // Get FAQ variables
 //
 $faq_file = ROOT_PATH.'languages/faq_'.$functions->get_config('language').'.php';
-if ( !file_exists($faq_file) || !is_readable($faq_file) )
+if ( !file_exists($faq_file) || !is_readable($faq_file) ) {
 	trigger_error('Unable to get "'.$functions->get_config('language').'" FAQ!', E_USER_ERROR);
-else
-	require($faq_file);
+} else {
+	require $faq_file;
+}
+
+$faq2 = [];
+$all_keys = [];
 
 //
 // Loop over FAQ and assign MD5 based keys
 //
-$faq2 = array();
-$all_keys = array();
 foreach ( $faq as $item ) {
-	
 	//
 	// Section
 	//
 	if ( $item[0] == '--' ) {
-		
 		$faq2[] = array('--', $item[1], '--');
 		continue;
-
 	}
 
 	//
@@ -153,17 +152,16 @@ foreach ( $faq as $item ) {
 			'question_title' => $item[0],
 			'question_entry' => ( $current ) ? $item[0] : '<a href="'.$question_link.'">'.$item[0].'</a>'
 		));
-		
 	}
-	
 }
 
-if ( count($faq) )
+if ( count($faq) ) {
 	$template->parse('contents_cat_footer', 'faq');
+}
 
 $template->parse('contents_footer', 'faq');
 
 //
 // Include the page footer
 //
-require(ROOT_PATH.'sources/page_foot.php');
+require ROOT_PATH.'sources/page_foot.php';

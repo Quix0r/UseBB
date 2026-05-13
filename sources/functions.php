@@ -40,8 +40,9 @@
 //
 // Die when called directly in browser
 //
-if ( !defined('INCLUDED') )
+if ( !defined('INCLUDED') ) {
 	exit();
+}
 
 /**
  * Debug output function
@@ -49,17 +50,16 @@ if ( !defined('INCLUDED') )
  * Takes variable number of arguments that get printed out to template.
  */
 function usebb_debug_output(): void {
-	
 	global $template;
 
 	$numargs = func_num_args();
 
-	if ( $template == null || USEBB_IS_PROD_ENV || $numargs == 0 )
+	if ( $template == null || USEBB_IS_PROD_ENV || $numargs == 0 ) {
 		return;
-	
+	}
+
 	$values = array_map('unhtml', array_map('print_r', func_get_args(), array_fill(0, $numargs, true)));
 	$template->add_raw_content('<pre>'.implode('<br />', $values).'</pre>');
-
 }
 
 /**
@@ -86,7 +86,6 @@ function usebb_clean_input_value(mixed &$value, string $key, bool $mq=false): vo
  * Will add slashes to the value.
  */
 function usebb_clean_db_value(mixed &$value, string $key): void {
-	
 	if ( is_array($value) ) {
 		array_walk($value, 'usebb_clean_db_value');
 	} elseif (!empty($value)) {
@@ -102,9 +101,7 @@ function usebb_clean_db_value(mixed &$value, string $key): void {
  * @return bool Contains entities
  */
 function contains_entities(string $string, bool $num_only=false): bool {
-	
 	return preg_match(( $num_only ? '#&\#[^;]+;#' : '#&\#?[^;]+;#' ), $string);
-	
 }
 
 /**
@@ -117,257 +114,256 @@ function contains_entities(string $string, bool $num_only=false): bool {
  * @return string String
  */
 function named_entities_to_numeric(string $string): string {
-	
-  $table = array(
-    "&nbsp;"     => "&#160;",
-    "&iexcl;"    => "&#161;",
-    "&cent;"     => "&#162;",
-    "&pound;"    => "&#163;",
-    "&curren;"   => "&#164;",
-    "&yen;"      => "&#165;",
-    "&brvbar;"   => "&#166;",
-    "&sect;"     => "&#167;",
-    "&uml;"      => "&#168;",
-    "&copy;"     => "&#169;",
-    "&ordf;"     => "&#170;",
-    "&laquo;"    => "&#171;",
-    "&not;"      => "&#172;",
-    "&shy;"      => "&#173;",
-    "&reg;"      => "&#174;",
-    "&macr;"     => "&#175;",
-    "&deg;"      => "&#176;",
-    "&plusmn;"   => "&#177;",
-    "&sup2;"     => "&#178;",
-    "&sup3;"     => "&#179;",
-    "&acute;"    => "&#180;",
-    "&micro;"    => "&#181;",
-    "&para;"     => "&#182;",
-    "&middot;"   => "&#183;",
-    "&cedil;"    => "&#184;",
-    "&sup1;"     => "&#185;",
-    "&ordm;"     => "&#186;",
-    "&raquo;"    => "&#187;",
-    "&frac14;"   => "&#188;",
-    "&frac12;"   => "&#189;",
-    "&frac34;"   => "&#190;",
-    "&iquest;"   => "&#191;",
-    "&Agrave;"   => "&#192;",
-    "&Aacute;"   => "&#193;",
-    "&Acirc;"    => "&#194;",
-    "&Atilde;"   => "&#195;",
-    "&Auml;"     => "&#196;",
-    "&Aring;"    => "&#197;",
-    "&AElig;"    => "&#198;",
-    "&Ccedil;"   => "&#199;",
-    "&Egrave;"   => "&#200;",
-    "&Eacute;"   => "&#201;",
-    "&Ecirc;"    => "&#202;",
-    "&Euml;"     => "&#203;",
-    "&Igrave;"   => "&#204;",
-    "&Iacute;"   => "&#205;",
-    "&Icirc;"    => "&#206;",
-    "&Iuml;"     => "&#207;",
-    "&ETH;"      => "&#208;",
-    "&Ntilde;"   => "&#209;",
-    "&Ograve;"   => "&#210;",
-    "&Oacute;"   => "&#211;",
-    "&Ocirc;"    => "&#212;",
-    "&Otilde;"   => "&#213;",
-    "&Ouml;"     => "&#214;",
-    "&times;"    => "&#215;",
-    "&Oslash;"   => "&#216;",
-    "&Ugrave;"   => "&#217;",
-    "&Uacute;"   => "&#218;",
-    "&Ucirc;"    => "&#219;",
-    "&Uuml;"     => "&#220;",
-    "&Yacute;"   => "&#221;",
-    "&THORN;"    => "&#222;",
-    "&szlig;"    => "&#223;",
-    "&agrave;"   => "&#224;",
-    "&aacute;"   => "&#225;",
-    "&acirc;"    => "&#226;",
-    "&atilde;"   => "&#227;",
-    "&auml;"     => "&#228;",
-    "&aring;"    => "&#229;",
-    "&aelig;"    => "&#230;",
-    "&ccedil;"   => "&#231;",
-    "&egrave;"   => "&#232;",
-    "&eacute;"   => "&#233;",
-    "&ecirc;"    => "&#234;",
-    "&euml;"     => "&#235;",
-    "&igrave;"   => "&#236;",
-    "&iacute;"   => "&#237;",
-    "&icirc;"    => "&#238;",
-    "&iuml;"     => "&#239;",
-    "&eth;"      => "&#240;",
-    "&ntilde;"   => "&#241;",
-    "&ograve;"   => "&#242;",
-    "&oacute;"   => "&#243;",
-    "&ocirc;"    => "&#244;",
-    "&otilde;"   => "&#245;",
-    "&ouml;"     => "&#246;",
-    "&divide;"   => "&#247;",
-    "&oslash;"   => "&#248;",
-    "&ugrave;"   => "&#249;",
-    "&uacute;"   => "&#250;",
-    "&ucirc;"    => "&#251;",
-    "&uuml;"     => "&#252;",
-    "&yacute;"   => "&#253;",
-    "&thorn;"    => "&#254;",
-    "&yuml;"     => "&#255;",
-    "&fnof;"     => "&#402;",
-    "&Alpha;"    => "&#913;",
-    "&Beta;"     => "&#914;",
-    "&Gamma;"    => "&#915;",
-    "&Delta;"    => "&#916;",
-    "&Epsilon;"  => "&#917;",
-    "&Zeta;"     => "&#918;",
-    "&Eta;"      => "&#919;",
-    "&Theta;"    => "&#920;",
-    "&Iota;"     => "&#921;",
-    "&Kappa;"    => "&#922;",
-    "&Lambda;"   => "&#923;",
-    "&Mu;"       => "&#924;",
-    "&Nu;"       => "&#925;",
-    "&Xi;"       => "&#926;",
-    "&Omicron;"  => "&#927;",
-    "&Pi;"       => "&#928;",
-    "&Rho;"      => "&#929;",
-    "&Sigma;"    => "&#931;",
-    "&Tau;"      => "&#932;",
-    "&Upsilon;"  => "&#933;",
-    "&Phi;"      => "&#934;",
-    "&Chi;"      => "&#935;",
-    "&Psi;"      => "&#936;",
-    "&Omega;"    => "&#937;",
-    "&alpha;"    => "&#945;",
-    "&beta;"     => "&#946;",
-    "&gamma;"    => "&#947;",
-    "&delta;"    => "&#948;",
-    "&epsilon;"  => "&#949;",
-    "&zeta;"     => "&#950;",
-    "&eta;"      => "&#951;",
-    "&theta;"    => "&#952;",
-    "&iota;"     => "&#953;",
-    "&kappa;"    => "&#954;",
-    "&lambda;"   => "&#955;",
-    "&mu;"       => "&#956;",
-    "&nu;"       => "&#957;",
-    "&xi;"       => "&#958;",
-    "&omicron;"  => "&#959;",
-    "&pi;"       => "&#960;",
-    "&rho;"      => "&#961;",
-    "&sigmaf;"   => "&#962;",
-    "&sigma;"    => "&#963;",
-    "&tau;"      => "&#964;",
-    "&upsilon;"  => "&#965;",
-    "&phi;"      => "&#966;",
-    "&chi;"      => "&#967;",
-    "&psi;"      => "&#968;",
-    "&omega;"    => "&#969;",
-    "&thetasym;" => "&#977;",
-    "&upsih;"    => "&#978;",
-    "&piv;"      => "&#982;",
-    "&bull;"     => "&#8226;",
-    "&hellip;"   => "&#8230;",
-    "&prime;"    => "&#8242;",
-    "&Prime;"    => "&#8243;",
-    "&oline;"    => "&#8254;",
-    "&frasl;"    => "&#8260;",
-    "&weierp;"   => "&#8472;",
-    "&image;"    => "&#8465;",
-    "&real;"     => "&#8476;",
-    "&trade;"    => "&#8482;",
-    "&alefsym;"  => "&#8501;",
-    "&larr;"     => "&#8592;",
-    "&uarr;"     => "&#8593;",
-    "&rarr;"     => "&#8594;",
-    "&darr;"     => "&#8595;",
-    "&harr;"     => "&#8596;",
-    "&crarr;"    => "&#8629;",
-    "&lArr;"     => "&#8656;",
-    "&uArr;"     => "&#8657;",
-    "&rArr;"     => "&#8658;",
-    "&dArr;"     => "&#8659;",
-    "&hArr;"     => "&#8660;",
-    "&forall;"   => "&#8704;",
-    "&part;"     => "&#8706;",
-    "&exist;"    => "&#8707;",
-    "&empty;"    => "&#8709;",
-    "&nabla;"    => "&#8711;",
-    "&isin;"     => "&#8712;",
-    "&notin;"    => "&#8713;",
-    "&ni;"       => "&#8715;",
-    "&prod;"     => "&#8719;",
-    "&sum;"      => "&#8721;",
-    "&minus;"    => "&#8722;",
-    "&lowast;"   => "&#8727;",
-    "&radic;"    => "&#8730;",
-    "&prop;"     => "&#8733;",
-    "&infin;"    => "&#8734;",
-    "&ang;"      => "&#8736;",
-    "&and;"      => "&#8743;",
-    "&or;"       => "&#8744;",
-    "&cap;"      => "&#8745;",
-    "&cup;"      => "&#8746;",
-    "&int;"      => "&#8747;",
-    "&there4;"   => "&#8756;",
-    "&sim;"      => "&#8764;",
-    "&cong;"     => "&#8773;",
-    "&asymp;"    => "&#8776;",
-    "&ne;"       => "&#8800;",
-    "&equiv;"    => "&#8801;",
-    "&le;"       => "&#8804;",
-    "&ge;"       => "&#8805;",
-    "&sub;"      => "&#8834;",
-    "&sup;"      => "&#8835;",
-    "&nsub;"     => "&#8836;",
-    "&sube;"     => "&#8838;",
-    "&supe;"     => "&#8839;",
-    "&oplus;"    => "&#8853;",
-    "&otimes;"   => "&#8855;",
-    "&perp;"     => "&#8869;",
-    "&sdot;"     => "&#8901;",
-    "&lceil;"    => "&#8968;",
-    "&rceil;"    => "&#8969;",
-    "&lfloor;"   => "&#8970;",
-    "&rfloor;"   => "&#8971;",
-    "&lang;"     => "&#9001;",
-    "&rang;"     => "&#9002;",
-    "&loz;"      => "&#9674;",
-    "&spades;"   => "&#9824;",
-    "&clubs;"    => "&#9827;",
-    "&hearts;"   => "&#9829;",
-    "&diams;"    => "&#9830;",
-    "&OElig;"    => "&#338;",
-    "&oelig;"    => "&#339;",
-    "&Scaron;"   => "&#352;",
-    "&scaron;"   => "&#353;",
-    "&Yuml;"     => "&#376;",
-    "&circ;"     => "&#710;",
-    "&tilde;"    => "&#732;",
-    "&ensp;"     => "&#8194;",
-    "&emsp;"     => "&#8195;",
-    "&thinsp;"   => "&#8201;",
-    "&zwnj;"     => "&#8204;",
-    "&zwj;"      => "&#8205;",
-    "&lrm;"      => "&#8206;",
-    "&rlm;"      => "&#8207;",
-    "&ndash;"    => "&#8211;",
-    "&mdash;"    => "&#8212;",
-    "&lsquo;"    => "&#8216;",
-    "&rsquo;"    => "&#8217;",
-    "&sbquo;"    => "&#8218;",
-    "&ldquo;"    => "&#8220;",
-    "&rdquo;"    => "&#8221;",
-    "&bdquo;"    => "&#8222;",
-    "&dagger;"   => "&#8224;",
-    "&Dagger;"   => "&#8225;",
-    "&permil;"   => "&#8240;",
-    "&lsaquo;"   => "&#8249;",
-    "&rsaquo;"   => "&#8250;",
-    "&euro;"     => "&#8364;",
-  );
+	$table = [
+		"&nbsp;"     => "&#160;",
+		"&iexcl;"    => "&#161;",
+		"&cent;"     => "&#162;",
+		"&pound;"    => "&#163;",
+		"&curren;"   => "&#164;",
+		"&yen;"      => "&#165;",
+		"&brvbar;"   => "&#166;",
+		"&sect;"     => "&#167;",
+		"&uml;"      => "&#168;",
+		"&copy;"     => "&#169;",
+		"&ordf;"     => "&#170;",
+		"&laquo;"    => "&#171;",
+		"&not;"      => "&#172;",
+		"&shy;"      => "&#173;",
+		"&reg;"      => "&#174;",
+		"&macr;"     => "&#175;",
+		"&deg;"      => "&#176;",
+		"&plusmn;"   => "&#177;",
+		"&sup2;"     => "&#178;",
+		"&sup3;"     => "&#179;",
+		"&acute;"    => "&#180;",
+		"&micro;"    => "&#181;",
+		"&para;"     => "&#182;",
+		"&middot;"   => "&#183;",
+		"&cedil;"    => "&#184;",
+		"&sup1;"     => "&#185;",
+		"&ordm;"     => "&#186;",
+		"&raquo;"    => "&#187;",
+		"&frac14;"   => "&#188;",
+		"&frac12;"   => "&#189;",
+		"&frac34;"   => "&#190;",
+		"&iquest;"   => "&#191;",
+		"&Agrave;"   => "&#192;",
+		"&Aacute;"   => "&#193;",
+		"&Acirc;"    => "&#194;",
+		"&Atilde;"   => "&#195;",
+		"&Auml;"     => "&#196;",
+		"&Aring;"    => "&#197;",
+		"&AElig;"    => "&#198;",
+		"&Ccedil;"   => "&#199;",
+		"&Egrave;"   => "&#200;",
+		"&Eacute;"   => "&#201;",
+		"&Ecirc;"    => "&#202;",
+		"&Euml;"     => "&#203;",
+		"&Igrave;"   => "&#204;",
+		"&Iacute;"   => "&#205;",
+		"&Icirc;"    => "&#206;",
+		"&Iuml;"     => "&#207;",
+		"&ETH;"      => "&#208;",
+		"&Ntilde;"   => "&#209;",
+		"&Ograve;"   => "&#210;",
+		"&Oacute;"   => "&#211;",
+		"&Ocirc;"    => "&#212;",
+		"&Otilde;"   => "&#213;",
+		"&Ouml;"     => "&#214;",
+		"&times;"    => "&#215;",
+		"&Oslash;"   => "&#216;",
+		"&Ugrave;"   => "&#217;",
+		"&Uacute;"   => "&#218;",
+		"&Ucirc;"    => "&#219;",
+		"&Uuml;"     => "&#220;",
+		"&Yacute;"   => "&#221;",
+		"&THORN;"    => "&#222;",
+		"&szlig;"    => "&#223;",
+		"&agrave;"   => "&#224;",
+		"&aacute;"   => "&#225;",
+		"&acirc;"    => "&#226;",
+		"&atilde;"   => "&#227;",
+		"&auml;"     => "&#228;",
+		"&aring;"    => "&#229;",
+		"&aelig;"    => "&#230;",
+		"&ccedil;"   => "&#231;",
+		"&egrave;"   => "&#232;",
+		"&eacute;"   => "&#233;",
+		"&ecirc;"    => "&#234;",
+		"&euml;"     => "&#235;",
+		"&igrave;"   => "&#236;",
+		"&iacute;"   => "&#237;",
+		"&icirc;"    => "&#238;",
+		"&iuml;"     => "&#239;",
+		"&eth;"      => "&#240;",
+		"&ntilde;"   => "&#241;",
+		"&ograve;"   => "&#242;",
+		"&oacute;"   => "&#243;",
+		"&ocirc;"    => "&#244;",
+		"&otilde;"   => "&#245;",
+		"&ouml;"     => "&#246;",
+		"&divide;"   => "&#247;",
+		"&oslash;"   => "&#248;",
+		"&ugrave;"   => "&#249;",
+		"&uacute;"   => "&#250;",
+		"&ucirc;"    => "&#251;",
+		"&uuml;"     => "&#252;",
+		"&yacute;"   => "&#253;",
+		"&thorn;"    => "&#254;",
+		"&yuml;"     => "&#255;",
+		"&fnof;"     => "&#402;",
+		"&Alpha;"    => "&#913;",
+		"&Beta;"     => "&#914;",
+		"&Gamma;"    => "&#915;",
+		"&Delta;"    => "&#916;",
+		"&Epsilon;"  => "&#917;",
+		"&Zeta;"     => "&#918;",
+		"&Eta;"      => "&#919;",
+		"&Theta;"    => "&#920;",
+		"&Iota;"     => "&#921;",
+		"&Kappa;"    => "&#922;",
+		"&Lambda;"   => "&#923;",
+		"&Mu;"       => "&#924;",
+		"&Nu;"       => "&#925;",
+		"&Xi;"       => "&#926;",
+		"&Omicron;"  => "&#927;",
+		"&Pi;"       => "&#928;",
+		"&Rho;"      => "&#929;",
+		"&Sigma;"    => "&#931;",
+		"&Tau;"      => "&#932;",
+		"&Upsilon;"  => "&#933;",
+		"&Phi;"      => "&#934;",
+		"&Chi;"      => "&#935;",
+		"&Psi;"      => "&#936;",
+		"&Omega;"    => "&#937;",
+		"&alpha;"    => "&#945;",
+		"&beta;"     => "&#946;",
+		"&gamma;"    => "&#947;",
+		"&delta;"    => "&#948;",
+		"&epsilon;"  => "&#949;",
+		"&zeta;"     => "&#950;",
+		"&eta;"      => "&#951;",
+		"&theta;"    => "&#952;",
+		"&iota;"     => "&#953;",
+		"&kappa;"    => "&#954;",
+		"&lambda;"   => "&#955;",
+		"&mu;"       => "&#956;",
+		"&nu;"       => "&#957;",
+		"&xi;"       => "&#958;",
+		"&omicron;"  => "&#959;",
+		"&pi;"       => "&#960;",
+		"&rho;"      => "&#961;",
+		"&sigmaf;"   => "&#962;",
+		"&sigma;"    => "&#963;",
+		"&tau;"      => "&#964;",
+		"&upsilon;"  => "&#965;",
+		"&phi;"      => "&#966;",
+		"&chi;"      => "&#967;",
+		"&psi;"      => "&#968;",
+		"&omega;"    => "&#969;",
+		"&thetasym;" => "&#977;",
+		"&upsih;"    => "&#978;",
+		"&piv;"      => "&#982;",
+		"&bull;"     => "&#8226;",
+		"&hellip;"   => "&#8230;",
+		"&prime;"    => "&#8242;",
+		"&Prime;"    => "&#8243;",
+		"&oline;"    => "&#8254;",
+		"&frasl;"    => "&#8260;",
+		"&weierp;"   => "&#8472;",
+		"&image;"    => "&#8465;",
+		"&real;"     => "&#8476;",
+		"&trade;"    => "&#8482;",
+		"&alefsym;"  => "&#8501;",
+		"&larr;"     => "&#8592;",
+		"&uarr;"     => "&#8593;",
+		"&rarr;"     => "&#8594;",
+		"&darr;"     => "&#8595;",
+		"&harr;"     => "&#8596;",
+		"&crarr;"    => "&#8629;",
+		"&lArr;"     => "&#8656;",
+		"&uArr;"     => "&#8657;",
+		"&rArr;"     => "&#8658;",
+		"&dArr;"     => "&#8659;",
+		"&hArr;"     => "&#8660;",
+		"&forall;"   => "&#8704;",
+		"&part;"     => "&#8706;",
+		"&exist;"    => "&#8707;",
+		"&empty;"    => "&#8709;",
+		"&nabla;"    => "&#8711;",
+		"&isin;"     => "&#8712;",
+		"&notin;"    => "&#8713;",
+		"&ni;"       => "&#8715;",
+		"&prod;"     => "&#8719;",
+		"&sum;"      => "&#8721;",
+		"&minus;"    => "&#8722;",
+		"&lowast;"   => "&#8727;",
+		"&radic;"    => "&#8730;",
+		"&prop;"     => "&#8733;",
+		"&infin;"    => "&#8734;",
+		"&ang;"      => "&#8736;",
+		"&and;"      => "&#8743;",
+		"&or;"       => "&#8744;",
+		"&cap;"      => "&#8745;",
+		"&cup;"      => "&#8746;",
+		"&int;"      => "&#8747;",
+		"&there4;"   => "&#8756;",
+		"&sim;"      => "&#8764;",
+		"&cong;"     => "&#8773;",
+		"&asymp;"    => "&#8776;",
+		"&ne;"       => "&#8800;",
+		"&equiv;"    => "&#8801;",
+		"&le;"       => "&#8804;",
+		"&ge;"       => "&#8805;",
+		"&sub;"      => "&#8834;",
+		"&sup;"      => "&#8835;",
+		"&nsub;"     => "&#8836;",
+		"&sube;"     => "&#8838;",
+		"&supe;"     => "&#8839;",
+		"&oplus;"    => "&#8853;",
+		"&otimes;"   => "&#8855;",
+		"&perp;"     => "&#8869;",
+		"&sdot;"     => "&#8901;",
+		"&lceil;"    => "&#8968;",
+		"&rceil;"    => "&#8969;",
+		"&lfloor;"   => "&#8970;",
+		"&rfloor;"   => "&#8971;",
+		"&lang;"     => "&#9001;",
+		"&rang;"     => "&#9002;",
+		"&loz;"      => "&#9674;",
+		"&spades;"   => "&#9824;",
+		"&clubs;"    => "&#9827;",
+		"&hearts;"   => "&#9829;",
+		"&diams;"    => "&#9830;",
+		"&OElig;"    => "&#338;",
+		"&oelig;"    => "&#339;",
+		"&Scaron;"   => "&#352;",
+		"&scaron;"   => "&#353;",
+		"&Yuml;"     => "&#376;",
+		"&circ;"     => "&#710;",
+		"&tilde;"    => "&#732;",
+		"&ensp;"     => "&#8194;",
+		"&emsp;"     => "&#8195;",
+		"&thinsp;"   => "&#8201;",
+		"&zwnj;"     => "&#8204;",
+		"&zwj;"      => "&#8205;",
+		"&lrm;"      => "&#8206;",
+		"&rlm;"      => "&#8207;",
+		"&ndash;"    => "&#8211;",
+		"&mdash;"    => "&#8212;",
+		"&lsquo;"    => "&#8216;",
+		"&rsquo;"    => "&#8217;",
+		"&sbquo;"    => "&#8218;",
+		"&ldquo;"    => "&#8220;",
+		"&rdquo;"    => "&#8221;",
+		"&bdquo;"    => "&#8222;",
+		"&dagger;"   => "&#8224;",
+		"&Dagger;"   => "&#8225;",
+		"&permil;"   => "&#8240;",
+		"&lsaquo;"   => "&#8249;",
+		"&rsaquo;"   => "&#8250;",
+		"&euro;"     => "&#8364;",
+	];
 
 	return strtr($string, $table);
 }
@@ -380,24 +376,24 @@ function named_entities_to_numeric(string $string): string {
  * @return string Parsed $string
  */
 function unhtml(string $string, bool $rss_mode=false): string {
-	
 	$string = htmlspecialchars($string);
-	
+
 	//
 	// Code which is necessary to not break numeric entities (quirky support for strange encodings on a page).
 	// Broken entities (without trailing ;) at string end are stripped since they break XML well-formedness.
 	//
-	if ( strpos($string, '&') !== false )
+	if ( strpos($string, '&') !== false ) {
 		$string = preg_replace(array('#&amp;\#([0-9]+)#', '#&\#?[a-z0-9]+$#'), array('&#\\1', ''), $string);
-	
+	}
+
 	//
 	// RSS mode
 	//
-	if ( $rss_mode )
+	if ( $rss_mode ) {
 		$string = named_entities_to_numeric($string);
-	
+	}
+
 	return $string;
-	
 }
 
 /**
@@ -407,12 +403,11 @@ function unhtml(string $string, bool $rss_mode=false): string {
  * @return int Length of $string
  */
 function entities_strlen(string $string): int {
-	
-	if ( strpos($string, '&') !== false )
+	if ( strpos($string, '&') !== false ) {
 		$string = preg_replace('#&\#?[^;]+;#', '.', $string);
-	
+	}
+
 	return strlen($string);
-	
 }
 
 /**
@@ -423,7 +418,6 @@ function entities_strlen(string $string): int {
  * @return string Trimmed string
  */
 function entities_rtrim(string $string, int $length): string {
-	
 	if ( function_exists('mb_language') && mb_language() != 'neutral') {
 		$strlen = 'mb_strlen';
 		$substr = 'mb_substr';
@@ -441,31 +435,22 @@ function entities_rtrim(string $string, int $length): string {
 	$entity_open = false;
 
 	while ( $pos < $strlen($string) && ( $new_length < $length || $entity_open ) ) {
-		
 		$char = $substr($string, $pos, 1);
-		
+
 		if ( $char == '&' ) {
-			
 			$entity_open = true;
-			
 		} elseif ( $char == ';' && $entity_open ) {
-			
 			$entity_open = false;
 			$new_length++;
-			
 		} elseif ( !$entity_open ) {
-			
 			$new_length++;
-			
 		}
-		
+
 		$new_string .= $char;
 		$pos++;
-		
 	}
-	
+
 	return $new_string;
-	
 }
 
 /**
@@ -477,7 +462,6 @@ function entities_rtrim(string $string, int $length): string {
  */
 function valid_int(string|int &$string): bool {
 	if ( $string == strval(intval($string)) ) {
-		
 		$string = (int) $string;
 		return true;
 	}
@@ -495,8 +479,7 @@ function valid_int(string|int &$string): bool {
  * @return bool Contains valid integer
  */
 function checkdnsrr_win(string $host, string $type=''): bool {
-	
-	$types = array(
+	$types = [
 		'A',
 		'MX',
 		'NS',
@@ -508,22 +491,20 @@ function checkdnsrr_win(string $host, string $type=''): bool {
 		'SRV',
 		'NAPTR',
 		'ANY'
-	);
+	];
 	$type = ( !empty($type) && in_array($type, $types) ) ? $type : 'MX';
-	
+
 	$output = array();
 	exec('nslookup -type='.$type.' '.$host, $output);
-	
+
 	$host_len = strlen($host);
 	foreach ( $output as $line ) {
-		
-		if ( !strncasecmp($line, $host, $host_len) )
+		if ( !strncasecmp($line, $host, $host_len) ) {
 			return true;
-		
+		}
 	}
-	
+
 	return false;
-	
 }
 
 /**
@@ -540,10 +521,6 @@ function checkdnsrr_win(string $host, string $type=''): bool {
  * @subpackage Core
  */
 class functions {
-	
-	/**#@+
-	 * @access private
-	 */
 	private $board_config = [];
 	private $board_config_original = [];
 	private $board_config_defined = [];
@@ -553,12 +530,80 @@ class functions {
 	private $mod_auth;
 	private $badwords;
 	private $updated_forums;
-	private $available = array('templates' => [], 'languages' => []);
+	private $available = [
+		'templates' => [],
+		'languages' => [],
+	];
 	private $db_tables = [];
 	private $server_load;
 	private $is_mbstring;
 	private $date_format_from_db = FALSE;
-	/**#@-*/
+
+	private static $timezones = [
+		'-12' => '-12:00',
+		'-11' => '-11:00',
+		'-10' => '-10:00',
+		'-9' => '-9:00',
+		'-8' => '-8:00',
+		'-7' => '-7:00',
+		'-6' => '-6:00',
+		'-5' => '-5:00',
+		'-4' => '-4:00',
+		'-3.5' => '-3:30',
+		'-3' => '-3:00',
+		'-2' => '-2:00',
+		'-1' => '-1:00',
+		'0' => '+0:00',
+		'+1' => '+1:00',
+		'+2' => '+2:00',
+		'+3' => '+3:00',
+		'+3.5' => '+3:30',
+		'+4' => '+4:00',
+		'+4.5' => '+4:30',
+		'+5' => '+5:00',
+		'+5.5' => '+5:30',
+		'+6' => '+6:00',
+		'+7' => '+7:00',
+		'+8' => '+8:00',
+		'+9' => '+9:00',
+		'+9.5' => '+9:30',
+		'+10' => '+10:00',
+		'+11' => '+11:00',
+		'+12' => '+12:00',
+	];
+
+	private static $existing_tags = ['code', 'b', 'i', 'u', 's', 'img', 'url', 'mailto', 'color', 'size', 'google', 'quote'];
+
+	private static $actions = [
+		'view' => 0,
+		'read' => 1,
+		'post' => 2,
+		'reply' => 3,
+		'edit' => 4,
+		'move' => 5,
+		'delete' => 6,
+		'lock' => 7,
+		'sticky' => 8,
+		'html' => 9
+	];
+
+	private static $errtypes = [
+		1     => 'E_ERROR',
+		2     => 'E_WARNING',
+		4     => 'E_PARSE',
+		8     => 'E_NOTICE',
+		16    => 'E_CORE_ERROR',
+		32    => 'E_CORE_WARNING',
+		64    => 'E_COMPILE_ERROR',
+		128   => 'E_COMPILE_WARNING',
+		256   => 'E_USER_ERROR',
+		512   => 'E_USER_WARNING',
+		1024  => 'E_USER_NOTICE',
+		2048  => 'E_STRICT',
+		4096  => 'E_RECOVERABLE_ERROR',
+		8192  => 'E_DEPRECATED',
+		16384 => 'E_USER_DEPRECATED',
+	];
 
 	public function usebb_die(int $errno, string $error, string $file, string $line) {
 		global $db, $dbs, $template, $session;
@@ -566,13 +611,14 @@ class functions {
 		//
 		// Ignore the ones we don't want
 		//
-		if ( ($errno & error_reporting()) == 0 )
+		if ( ($errno & error_reporting()) == 0 ) {
 			return;
-		
+		}
+
 		//
 		// Ignore certain messages
 		//
-		foreach ( array(
+		foreach ( [
 			// Might be disabled
 			'ini_set', 'ini_get', 'exec()',
 			// Available since PHP 5.0.0. Removed in PHP 5.3.0
@@ -583,83 +629,59 @@ class functions {
 			'mb_language',
 			// Garbage data
 			'unserialize'
-		) as $ignore_warning ) {
-			
-			if ( strpos($error, $ignore_warning) !== FALSE )
+		] as $ignore_warning ) {
+			if ( strpos($error, $ignore_warning) !== FALSE ) {
 				return;
-			
+			}
 		}
-		
+
 		//
 		// Error processing...
 		//
-		
-		$errtypes = array(
-			1     => 'E_ERROR',
-			2     => 'E_WARNING',
-			4     => 'E_PARSE',
-			8     => 'E_NOTICE',
-			16    => 'E_CORE_ERROR',
-			32    => 'E_CORE_WARNING',
-			64    => 'E_COMPILE_ERROR',
-			128   => 'E_COMPILE_WARNING',
-			256   => 'E_USER_ERROR',
-			512   => 'E_USER_WARNING',
-			1024  => 'E_USER_NOTICE',
-			2048  => 'E_STRICT',
-			4096  => 'E_RECOVERABLE_ERROR',
-			8192  => 'E_DEPRECATED',
-			16384 => 'E_USER_DEPRECATED',
-		);
-		
 		if ( !strncmp($error, 'SQL:', 4) ) {
-			
 			$errtype = 'SQL_ERROR';
 			$error = substr($error, 5);
-			
 		} else {
-			
-			$errtype = $errtypes[$errno];
-			
+			$errtype = self::$errtypes[$errno];
 		}
-		
+
 		//
 		// Log using PHP's mechanism
 		//
 		if ( $this->get_config('enable_error_log') ) {
-			
 			$ip_addr = ( is_object($session) && !empty($session->sess_info['ip_addr']) ) ? $session->sess_info['ip_addr'] : '?';
 			error_log('[UseBB Error] '
 				.'['.date('Y-m-d H:i:s').'] '
 				.'['.$ip_addr.'] '
 				.'['.$errtype.' - '.preg_replace('#(?:\s+|\s)#', ' ', $error).'] '
 				.'['.$file.':'.$line.']');
-
 		}
-		
+
 		//
 		// Ignore hidden errors on production env (after being logged).
 		//
-		if ( USEBB_IS_PROD_ENV && ( ($errno & (USEBB_DEV_ERROR_LEVEL ^ USEBB_PROD_ERROR_LEVEL)) > 0 ) )
+		if ( USEBB_IS_PROD_ENV && ( ($errno & (USEBB_DEV_ERROR_LEVEL ^ USEBB_PROD_ERROR_LEVEL)) > 0 ) ) {
 			return;
-		
+		}
+
 		//
 		// Filter some sensitive data
 		//
-		
+
 		//
 		// Full script path
 		//
 		$full_path = substr(dirname(__FILE__), 0, -7);
 		$file = str_replace($full_path, '', $file);
 		$error = str_replace($full_path, '', $error);
-		
+
 		//
 		// MySQL username and host for debug levels < extended
 		//
-		if ( ( !strncmp($error, 'mysql', 5) || $errtype == 'SQL_ERROR' ) && $this->get_config('debug') < DEBUG_EXTENDED )
+		if ( ( !strncmp($error, 'mysql', 5) || $errtype == 'SQL_ERROR' ) && $this->get_config('debug') < DEBUG_EXTENDED ) {
 			$error = preg_replace("#'[^ ]+'?@'?[^ ]+'#", '<em>-filtered-</em>', $error);
-		
+		}
+
 		$html_msg  = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 	<head>
@@ -696,26 +718,22 @@ class functions {
 		<blockquote>
 			<p>In file <strong>'.$file.'</strong> on line <strong>'.$line.'</strong>:</p>
 			<p id="error"><em>'.$errtype.'</em> - '.nl2br($error).'</p>';
-				
+
 		//
 		// Show query with extended debug
 		//
 		if ( $errtype == 'SQL_ERROR' && $this->get_config('debug') == DEBUG_EXTENDED ) {
-			
 			$used_queries = $db->get_used_queries();
-			
+
 			if ( count($used_queries) ) {
-				
 				$html_msg .= '
 			<p>SQL query causing the error:</p><p><textarea rows="10" cols="60" readonly="readonly">'.unhtml(end($used_queries)).'</textarea></p>';
-				
 			}
-			
 		}
-		
+
 		$html_msg .= '
 		</blockquote>';
-		
+
 		//
 		// Installation note if
 		// - config.php does not exist
@@ -732,23 +750,21 @@ class functions {
 		<p><strong>UseBB may not have been installed yet.</strong></p>
 		<p>If this is the case and you are the owner of this board, please <a href="docs/index.html">see docs/index.html for <strong>installation instructions</strong></a>.</p>
 		<p>Otherwise, please report this error to the owner.</p>';
-			
 		} else {
-			
 			$html_msg .= '
 		<p>This error should probably not have occured, so please report it to the owner. Thank you for your help.</p>
 		<p>If you are the owner of this board and you believe this is a bug, please send a bug report.</p>';
-			
 		}
-		
-	$html_msg .= '
+
+		$html_msg .= '
 	</body>
 </html>';
-		
-		if ( isset($template) )
+
+		if ( isset($template) ) {
 			ob_end_clean();
+		}
+
 		die($html_msg);
-		
 	}
 	
 	/**
@@ -761,46 +777,45 @@ class functions {
 	 * @return mixed Value of setting
 	 */
 	public function get_config(string $setting, bool $original=false): mixed {
-		
 		global $session;
 
 		//
 		// Really early stage where config file is not loaded yet.
 		//
-		if ( !defined('USEBB_VERSION') )
+		if ( !defined('USEBB_VERSION') ) {
 			return FALSE;
-		
+		}
+
 		//
 		// Load settings into array.
 		//
 		if ( !count($this->board_config_original) ) {
-			
 			$this->board_config_original = array_merge($GLOBALS['dbs'], $GLOBALS['conf']);
 			$this->board_config_defined = array_keys($this->board_config_original);
-			
 		}
-		
+
 		//
 		// users_must_activate was renamed to activation_mode.
 		//
-		if ( $setting == 'activation_mode' && !isset($this->board_config_original[$setting]) )
+		if ( $setting == 'activation_mode' && !isset($this->board_config_original[$setting]) ) {
 			$setting = 'users_must_activate';
-		
+		}
+
 		//
 		// Some missing (newer) settings have default values and are added to original config.
 		//
 		if ( !isset($this->board_config_original[$setting]) ) {
-			
 			switch ( $setting ) {
-				
 				case 'search_limit_results':
 				case 'sig_max_length':
 					$set_to = 1000;
 					break;
+
 				case 'search_nonindex_words_min_length':
 				case 'username_min_length':
 					$set_to = 3;
 					break;
+
 				case 'enable_ip_bans':
 				case 'enable_badwords_filter':
 				case 'guests_can_see_contact_info':
@@ -813,43 +828,50 @@ class functions {
 				case 'dnsbl_powered_banning_globally':
 					$set_to = true;
 					break;
+
 				case 'view_search_min_level':
 				case 'view_active_topics_min_level':
 					$set_to = LEVEL_GUEST;
 					break;
+
 				case 'dnsbl_powered_banning_whitelist':
 				case 'dnsbl_powered_banning_servers':
 					$set_to = [];
 					break;
+
 				case 'username_max_length':
 					$set_to = 30;
 					break;
+
 				case 'edit_post_timeout':
 					$set_to = 900;
 					break;
+
 				case 'mass_email_msg_recipients':
 					$set_to = 50;
 					break;
+
 				case 'acp_auto_logout':
 					$set_to = 10;
 					break;
+
 				default:
 					$set_to = null;
-				
 			}
-			
-			if ( isset($set_to) )
+
+			if ( isset($set_to) ) {
 				$this->board_config_original[$setting] = $set_to;
-			
+			}
 		}
 
 		//
 		// Get original settings when requested.
 		// Treat a missing one as "false".
 		//
-		if ( defined('IS_INSTALLER') || $original )
+		if ( defined('IS_INSTALLER') || $original ) {
 			return ( isset($this->board_config_original[$setting]) ) ? $this->board_config_original[$setting] : false;
-		
+		}
+
 		//
 		// As of here, settings are altered and no longer "original",
 		// e.g. can contain inherited settings from user accounts or be computed.
@@ -860,85 +882,89 @@ class functions {
 		//
 		// Settings cache for this request.
 		//
-		if ( isset($this->board_config[$setting]) )
+		if ( isset($this->board_config[$setting]) ) {
 			return $this->board_config[$setting];
-		
+		}
+
 		//
 		// User-based settings.
 		//
 		if ( is_object($session) && !empty($session->sess_info['user_id']) && isset($session->sess_info['user_info'][$setting]) ) {
-			
 			switch ( $setting ) {
-				
 				case 'language':
 					$keep_default = ( !in_array($session->sess_info['user_info'][$setting], $this->get_language_packs()) );
 					break;
+
 				case 'template':
 					$keep_default = ( !in_array($session->sess_info['user_info'][$setting], $this->get_template_sets()) );
 					break;
+
 				default:
 					$keep_default = false;
-				
 			}
-			
+
 			$this->board_config[$setting] = ( $keep_default ) ? $this->board_config_original[$setting] : $session->sess_info['user_info'][$setting];
-			
-			if ( !$keep_default && $setting == 'date_format' )
+
+			if ( !$keep_default && $setting == 'date_format' ) {
 				$this->date_format_from_db = TRUE;
-			
+			}
+
 			return $this->board_config[$setting];
-			
 		}
-		
+
 		//
 		// Auto-detected settings when empty.
 		//
 		if ( in_array($setting, array('board_url', 'cookie_domain', 'cookie_path')) && empty($this->board_config_original[$setting]) ) {
-			
 			switch ( $setting ) {
-				
 				case 'board_url':
 					$path_parts = pathinfo($_SERVER['SCRIPT_NAME']);
-					if ( ON_WINDOWS )
+					if ( ON_WINDOWS ) {
 						$path_parts['dirname'] = str_replace('\\', '/', $path_parts['dirname']);
-					if ( substr($path_parts['dirname'], -1) != '/' )
+					}
+					if ( substr($path_parts['dirname'], -1) != '/' ) {
 						$path_parts['dirname'] .= '/';
+					}
 					$protocol = ( isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ) ? 'https' : 'http';
 					$set_to = $protocol.'://'.$_SERVER['HTTP_HOST'].$path_parts['dirname'];
 					break;
+
 				case 'cookie_domain':
 					$set_to = ( !empty($_SERVER['SERVER_NAME']) && preg_match('#^(?:[a-z0-9\-]+\.){1,}[a-z]{2,}$#i', $_SERVER['SERVER_NAME']) ) ? preg_replace('#^www\.#', '.', $_SERVER['SERVER_NAME']) : '';
 					break;
+
 				case 'cookie_path':
 					$set_to = '/';
-				
+					break;
 			}
-			
+
 			$this->board_config[$setting] = $set_to;
+
 			return $this->board_config[$setting];
-			
 		}
-		
+
 		//
 		// Settings that need validity checking.
 		//
 		if ( in_array($setting, array('board_url', 'session_name', 'debug')) ) {
-			
 			$set_to = $this->board_config_original[$setting];
-			
-			if ( $setting == 'board_url' && substr($set_to, -1) != '/' )
+
+			if ( $setting == 'board_url' && substr($set_to, -1) != '/' ) {
 				$set_to .= '/';
-			if ( $setting == 'session_name' && ( !preg_match('#^[A-Za-z0-9]+$#', $set_to) || preg_match('#^[0-9]+$#', $set_to) ) )
+			}
+			if ( $setting == 'session_name' && ( !preg_match('#^[A-Za-z0-9]+$#', $set_to) || preg_match('#^[0-9]+$#', $set_to) ) ) {
 				$set_to = 'usebb';
+			}
+
 			// Only allow extended debug when not in production environment.
-			if ( $setting == 'debug' && $set_to == DEBUG_EXTENDED && USEBB_IS_PROD_ENV )
+			if ( $setting == 'debug' && $set_to == DEBUG_EXTENDED && USEBB_IS_PROD_ENV ) {
 				$set_to = DEBUG_SIMPLE;
-			
+			}
+
 			$this->board_config[$setting] = $set_to;
 			return $this->board_config[$setting];
-			
 		}
-		
+
 		//
 		// All other settings taken from the original array.
 		// Use false when setting does not exist.
@@ -946,9 +972,8 @@ class functions {
 		$this->board_config[$setting] = isset($this->board_config_original[$setting]) ? $this->board_config_original[$setting] : false;
 
 		return $this->board_config[$setting];
-		
 	}
-	
+
 	/**
 	 * Get board statistics
 	 *
@@ -956,26 +981,25 @@ class functions {
 	 * @return mixed Statistical value
 	 */
 	public function get_stats(string $stat): mixed {
-		
 		global $db;
-		
+
 		//
 		// Already requested, return
 		//
-		if ( isset($this->statistics[$stat]) )
+		if ( isset($this->statistics[$stat]) ) {
 			return $this->statistics[$stat];
-		
+		}
+
 		//
 		// Get requested value
 		//
 		switch ( $stat ) {
-			
 			case 'categories':
 				$result = $db->query("SELECT COUNT(id) AS count FROM ".TABLE_PREFIX."cats");
 				$out = $db->fetch_result($result);
 				$this->statistics[$stat] = $out['count'];
 				break;
-			
+
 			case 'forums':
 				$result = $db->query("SELECT COUNT(id) AS count FROM ".TABLE_PREFIX."forums");
 				$out = $db->fetch_result($result);
@@ -984,34 +1008,35 @@ class functions {
 
 			case 'viewable_forums':
 				$result = $db->query("SELECT id, auth FROM ".TABLE_PREFIX."forums");
+
 				$this->statistics[$stat] = 0;
-				
+
 				while ( $forumdata = $db->fetch_result($result) ) {
-					
-					if ( $this->auth($forumdata['auth'], 'view', $forumdata['id']) )
+					if ( $this->auth($forumdata['auth'], 'view', $forumdata['id']) ) {
 						$this->statistics[$stat]++;
-					
+					}
 				}
 				break;
-			
+
 			case 'latest_member':
 				$never_activated_sql = ( $this->get_config('show_never_activated_members') ) ? "" : " WHERE ( active <> 0 OR last_login <> 0 )";
 				$result = $db->query("SELECT id, displayed_name, regdate FROM ".TABLE_PREFIX."members".$never_activated_sql." ORDER BY id DESC LIMIT 1");
 				$this->statistics[$stat] = $db->fetch_result($result);
 				break;
-			
+
 			default:
 				$result = $db->query("SELECT name, content FROM ".TABLE_PREFIX."stats");
-				while ( $out = $db->fetch_result($result) )
+
+				while ( $out = $db->fetch_result($result) ) {
 					$this->statistics[$out['name']] = $out['content'];
-			
+				}
 		}
-		
-		if ( isset($this->statistics[$stat]) )
+
+		if ( isset($this->statistics[$stat]) ) {
 			return $this->statistics[$stat];
-		else
+		} else {
 			trigger_error('The statistic variable "'.$stat.'" does not exist!', E_USER_ERROR);
-		
+		}
 	}
 	
 	/**
@@ -1041,7 +1066,6 @@ class functions {
 	 * @return string URL
 	 */
 	public function _make_friendly_url(string $filename, array $vars): string {
-		
 		if ( $filename == 'index' && count($vars) == 0 ) {
 			return './';
 		}
@@ -1169,10 +1193,9 @@ class functions {
 	 * @return array Language variables
 	 */
 	public function fetch_language(string $language='', string $section=''): array {
-		
 		$language = ( !empty($language) && in_array($language, $this->get_language_packs()) ) ? $language : $this->get_config('language');
 		$section = ( !empty($section) ) ? $section : 'lang';
-		
+
 		if ( !isset($this->language_sections[$language]) || !in_array($section, $this->language_sections[$language]) ) {
 			//
 			// Not loaded yet
@@ -1188,12 +1211,12 @@ class functions {
 					// Fallback to English
 					//
 					if ( $language != 'English' && in_array('English', $this->get_language_packs()) ) {
-						require(ROOT_PATH.'languages/'.$section.'_English.php');
+						require ROOT_PATH.'languages/'.$section.'_English.php';
 					} else {
 						trigger_error('Section "'.$section.'" for language pack "'.$language.'" could not be found. No English fallback was available. Please use an updated language pack or also upload the English one.', E_USER_ERROR);
 					}
 				} else {
-					require(ROOT_PATH.'languages/'.$section.'_'.$language.'.php');
+					require ROOT_PATH.'languages/'.$section.'_'.$language.'.php';
 
 					//
 					// Merge with English for missing strings
@@ -1203,7 +1226,7 @@ class functions {
 					}
 				}
 			} else {
-				require(ROOT_PATH.'languages/'.$section.'_'.$language.'.php');
+				require ROOT_PATH.'languages/'.$section.'_'.$language.'.php';
 
 				//
 				// Merge with English for missing strings
@@ -1259,28 +1282,23 @@ class functions {
 	 * Kick a user to the login form
 	 */
 	public function redir_to_login(): void {
-		
 		global $session, $template, $lang;
-		
+
 		if ( !$session->sess_info['user_id'] ) {
-			
 			$_SESSION['referer'] = $_SERVER['REQUEST_URI'];
 			$this->redirect('panel.php', array('act' => 'login'));
-			
 		} else {
-			
 			header(HEADER_403);
+
 			$template->clear_breadcrumbs();
 			$template->add_breadcrumb($lang['Note']);
 			$template->parse('msgbox', 'global', array(
 				'box_title' => $lang['Note'],
 				'content' => $lang['NotPermitted']
 			));
-			
 		}
-		
 	}
-	
+
 	/**
 	 * Generate a date given a timestamp
 	 *
@@ -1291,26 +1309,27 @@ class functions {
 	 * @return string Date
 	 */
 	public function make_date(int $stamp, string $format='', bool $keep_gmt=false, bool $translate=true): string {
-		
 		global $lang;
-		
+
 		$format = ( !empty($format) ) ? $format : strip_tags($this->get_config('date_format'));
-		
-		if ( $this->date_format_from_db )
+
+		if ( $this->date_format_from_db ) {
 			$format = stripslashes($format);
-		
-		if ( $keep_gmt )
+		}
+
+		if ( $keep_gmt ) {
 			$date = gmdate($format, $stamp);
-		else
+		} else {
 			$date = gmdate($format, $stamp + (3600 * $this->get_config('timezone')) + (3600 * $this->get_config('dst')));
-		
-		if ( $translate && isset($lang['date_translations']) && is_array($lang['date_translations']) )
+		}
+
+		if ( $translate && isset($lang['date_translations']) && is_array($lang['date_translations']) ) {
 			$date = ucfirst(strtr($date, $lang['date_translations']));
-		
+		}
+
 		return $date;
-		
 	}
-	
+
 	/**
 	 * Generate a time past string
 	 *
@@ -1319,35 +1338,31 @@ class functions {
 	 * @return string Time past
 	 */
 	public function time_past(int $timestamp, ?int $until=null): string {
-	
 		global $lang;
-	
+
 		$seconds = ( ( is_int($until) ) ? $until : time() ) - $timestamp;
-	
+
 		$times = [];
-		$sections = array(
+		$sections = [
 			'weeks' => 604800,
 			'days' => 86400,
 			'hours' => 3600,
 			'minutes' => 60,
 			'seconds' => 1
-		);
-	
+		];
+
 		foreach( $sections as $what => $length ) {
-			
 			if ( $seconds >= $length ) {
-				
 				$times[$what] = ( $length >0 ) ? floor($seconds / $length) : $length;
 				$seconds %= $length;
-				
 			}
-			
 		}
-	
+
 		$sections = [];
-		foreach ( $times as $key => $val )
+		foreach ( $times as $key => $val ) {
 			$sections[] = $val.' '.$lang[ucfirst($key)];
-	
+		}
+
 		return array($times, join(', ', $sections));
 	
 	}
@@ -1359,9 +1374,8 @@ class functions {
 	 * @return string HTML
 	 */
 	public function show_email(array $user): string {
-		
 		global $session, $lang;
-		
+
 		//
 		// Possible email_view_level values:
 		// - 0: Hide all
@@ -1369,50 +1383,41 @@ class functions {
 		// - 2: Show spam proof
 		// - 3: Show raw
 		//
-		
 		$email_view_level = $this->get_config('email_view_level');
-		
+
 		if ( $this->get_user_level() >= $this->get_config('view_hidden_email_addresses_min_level') ) {
-			
 			//
 			// This user may view hidden e-mail addresses
 			//
 			$return = '<a href="mailto:'.$user['email'].'">'.$user['email'].'</a>';
-			if ( $email_view_level == 1 )
+			if ( $email_view_level == 1 ) {
 				$return = '<a href="'.$this->make_url('mail.php', array('id' => $user['id'])).'">'.$lang['SendMessage'].'</a> ('.$return.')';
-			
+			}
 		} else {
-			
 			if ( $email_view_level == 0 || ( !$user['email_show'] && $user['id'] != $session->sess_info['user_id'] ) ) {
-				
 				//
 				// E-mail addresses are hidden or the user has chosen to keep it hidden
 				//
 				$return = $lang['Hidden'];
-				
 			} else {
-				
 				switch ( $email_view_level ) {
-					
 					case 1:
 						$return = '<a href="'.$this->make_url('mail.php', array('id' => $user['id'])).'">'.$lang['SendMessage'].'</a>';
 						break;
+
 					case 2:
 						$user['email'] = $this->string_to_entities($user['email']);
 						// No break here, since we just want to convert $user['email']
+
 					default:
 						$return = '<a href="mailto:'.$user['email'].'">'.$user['email'].'</a>';
-					
 				}
-				
 			}
-			
 		}
-		
+
 		return $return;
-		
 	}
-	
+
 	/**
 	 * Translate an ASCII string to HTML entities
 	 *
@@ -1422,14 +1427,14 @@ class functions {
 	 * @return string Converted string
 	 */
 	public function string_to_entities(string $string): string {
-		
 		$length = strlen($string);
+
 		$new_string = '';
-		for ( $i = 0; $i < $length; $i++ )
+		for ( $i = 0; $i < $length; $i++ ) {
 			$new_string .= '&#'.ord(substr($string, $i, $i+1)).';';
-		
+		}
+
 		return $new_string;
-		
 	}
 
 	/**
@@ -1439,30 +1444,29 @@ class functions {
 	 * @return string Random key
 	 */
 	public function random_key(bool $is_password=false): string {
-		
-		if ( !$is_password )
+		if ( !$is_password ) {
 			return md5(mt_rand());
-		
+		}
+
 		$chars = range(33, 126); // ! until ~
 		$max = count($chars) - 1;
 
 		$passwd_min_length = (int) $this->get_config('passwd_min_length');
 		$length = ( $passwd_min_length > 10 ) ? $passwd_min_length : 10;
-		
+
 		do {
-		
 			$key = '';
-			for ( $i = 0; $i < $length; $i++ )
+
+			for ( $i = 0; $i < $length; $i++ ) {
 				$key .= chr($chars[mt_rand(0, $max)]);
+			}
 
 			$valid = $this->validate_password($key, true);
-
 		} while ( !$valid );
-		
+
 		return $key;
-		
 	}
-	
+
 	/**
 	 * Send an email
 	 *
@@ -1479,11 +1483,10 @@ class functions {
 	 * @param string $charset Character set the e-mail is in (default charset when missing)
 	 */
 	public function usebb_mail(string $subject, string $rawbody, array $bodyvars, string $from_name, string $from_email, string $to, string $bcc_email='', string $language='', string $charset='') {
-		
 		global $lang;
-		
+
 		$bodyvars = ( is_array($bodyvars) ) ? $bodyvars : [];
-		
+
 		$is_enable_mbstring = ( function_exists('mb_language') && mb_language() != 'neutral' );
 
 		//
@@ -1492,113 +1495,102 @@ class functions {
 		//
 		$language = ( !empty($language) ) ? $language : $this->get_config('language');
 		$charset = ( !empty($charset) ) ? $charset : $lang['character_encoding'];
-		
+
 		//
 		// Set the correct mb_language when neccessary (when mbstring enabled)
 		//
 		$is_mbstring = FALSE;
 		if ( $this->is_mbstring ) {
-			
 			$backup_mb_language = mb_language();
 			$backup_mb_internal_encoding = mb_internal_encoding();
-			
-			if ( @mb_language($language) !== FALSE && @mb_internal_encoding($charset) !== FALSE )
+
+			if ( @mb_language($language) !== FALSE && @mb_internal_encoding($charset) !== FALSE ) {
 				$is_mbstring = TRUE;
-			
+			}
 		}
-		
+
 		$body = str_replace(array("\r\n", "\r"), "\n", $rawbody);
-		
+
 		//
 		// Windows: \r\n; other: \n
 		//
 		$cr = ( ON_WINDOWS ) ? "\r\n" : "\n";
 		$body = str_replace("\n", $cr, $rawbody);
-		
+
 		$bodyvars['board_name'] = $this->get_config('board_name');
 		$bodyvars['board_link'] = $this->get_config('board_url');
 		$bodyvars['admin_email'] = $this->get_config('admin_email');
-		
-		foreach ( $bodyvars as $key => $val )
-			$body = str_replace('['.$key.']', $val, $body);
-		
-		$headers = [];
-		
-		if ( $is_mbstring && function_exists('mb_encode_mimeheader') ) {
-			
-			$from_name = mb_encode_mimeheader($from_name);
-			
-		} else {
-			
-			if ( strtolower($charset) == 'utf-8' ) {
 
+		foreach ( $bodyvars as $key => $val ) {
+			$body = str_replace('['.$key.']', $val, $body);
+		}
+
+		$headers = [];
+
+		if ( $is_mbstring && function_exists('mb_encode_mimeheader') ) {
+			$from_name = mb_encode_mimeheader($from_name);
+		} else {
+			if ( strtolower($charset) == 'utf-8' ) {
 				$subject = '=?'.$charset.'?B?'.base64_encode($subject).'?=';
 				$from_name = '=?'.$charset.'?B?'.base64_encode($from_name).'?=';
-
 			}
-			
 		}
-		
-		if ( !empty($bcc_email) )
+
+		if ( !empty($bcc_email) ) {
 			$headers[] = 'Bcc: '.$bcc_email;
+		}
+
 		$headers[] = 'Date: '.date('r');
 		$headers[] = 'Message-Id: '.sprintf("<%s.%s>", substr(md5(time()), 4, 10), $from_email);
 		$headers[] = 'X-Mailer: UseBB';
-		
+
 		//
 		// Fix for hosts that require From to be a domain name hosted on the same host
 		// So, instead we can use a Reply-To header to contain the sender email
 		//
 		if ( $from_email != $this->get_config('admin_email') && $this->get_config('email_reply-to_header') ) {
-			
 			$headers[] = 'From: "'.$from_name.'" <'.$this->get_config('admin_email').'>';
 			$headers[] = 'Reply-To: '.$from_email;
-			
 		} else {
-			
 			$headers[] = 'From: "'.$from_name.'" <'.$from_email.'>';
-			
 		}
-		
+
 		// TODO safe mode to be removed in PHP 5.4
 		$is_safe_mode = in_array(strtolower(ini_get('safe_mode')), array('1', 'on'));
 
 		if ( $is_mbstring && function_exists('mb_send_mail') ) {
-
 			$mail_func = 'mb_send_mail';
-
 		} else {
-			
 			$mail_func = 'mail';
 			$headers[] = 'MIME-Version: 1.0';
 			$headers[] = 'Content-Type: text/plain; charset='.$charset;
-			if ( preg_match('/^(iso-8859-|iso-2022-)/i', $charset))
+
+			if ( preg_match('/^(iso-8859-|iso-2022-)/i', $charset)) {
 				$headers[] = 'Content-Transfer-Encoding: 7bit';
-			else
+			} else {
 				$headers[] = 'Content-Transfer-Encoding: 8bit';
-			
+			}
 		}
 
-		if ( $is_safe_mode || !$this->get_config('sendmail_sender_parameter') )
+		if ( $is_safe_mode || !$this->get_config('sendmail_sender_parameter') ) {
 			$mail_result = $mail_func($to, $subject, $body, join($cr, $headers));
-		else
+		} else {
 			$mail_result = $mail_func($to, $subject, $body, join($cr, $headers), '-f'.$from_email);
+		}
 
-		if ( !$mail_result )
+		if ( !$mail_result ) {
 			trigger_error('Unable to send e-mail!', E_USER_ERROR);
-		
+		}
+
 		//
 		// Restored language and character encoding.
 		//
 		if ( $this->is_mbstring ) {
-			
 			mb_language($backup_mb_language);
 			mb_internal_encoding($backup_mb_internal_encoding);
-			
 		}
-		
 	}
-	
+
 	/**
 	 * Set the remember cookie
 	 *
@@ -1606,10 +1598,10 @@ class functions {
 	 * @param string $passwd_hash Password hash
 	 */
 	public function set_al(int $user_id, string $passwd_hash): void {
-		$content = array(
-			intval($user_id),
+		$content = [
+			$user_id,
 			$passwd_hash
-		);
+		];
 
 		$this->setcookie($this->get_config('session_name').'_al', serialize($content), time()+31536000);
 	}
@@ -1643,7 +1635,7 @@ class functions {
 	 *
 	 * @return mixed Array with user ID and password hash -or- false when not set
 	 */
-	public function get_al(): mixed {
+	public function get_al(): array|bool {
 		if ( !$this->isset_al() ) {
 			return FALSE;
 		}
@@ -1656,7 +1648,7 @@ class functions {
 	 *
 	 * @return int User level
 	 */
-	public function get_user_level(): ?int {
+	public function get_user_level(): int {
 		global $session;
 
 		if ( !isset($session->sess_info['user_id']) ) {
@@ -1706,6 +1698,7 @@ class functions {
 				if ( !is_array($this->mod_auth) ) {
 					$result = $db->query("SELECT forum_id FROM ".TABLE_PREFIX."moderators WHERE user_id = ".$user_info['id']);
 					$this->mod_auth = [];
+
 					while ( $out = $db->fetch_result($result) ) {
 						$this->mod_auth[] = intval($out['forum_id']);
 					}
@@ -1730,20 +1723,7 @@ class functions {
 		// Get the part of the auth integer that
 		// corresponds with the action given
 		//
-		$actions = array(
-			'view' => 0,
-			'read' => 1,
-			'post' => 2,
-			'reply' => 3,
-			'edit' => 4,
-			'move' => 5,
-			'delete' => 6,
-			'lock' => 7,
-			'sticky' => 8,
-			'html' => 9
-		);
-
-		$min_level = intval($auth_int[$actions[$action]]);
+		$min_level = intval($auth_int[self::$actions[$action]]);
 
 		//
 		// If the user level is equal or greater than the
@@ -1760,47 +1740,38 @@ class functions {
 	 * @return string Moderator list
 	 */
 	public function get_mods_list(int $forum, array $listarray=[]): string {
-		
 		global $db, $lang;
-		
+
 		$forum_moderators = [];
-		
+
 		if ( is_array($listarray) && count($listarray) ) {
-			
 			foreach ( $listarray as $modsdata ) {
-				
-				if ( $modsdata['forum_id'] == $forum )
+				if ( $modsdata['forum_id'] == $forum ) {
 					$forum_moderators[] = $this->make_profile_link($modsdata['id'], $modsdata['displayed_name'], $modsdata['level']);
-				
+				}
 			}
-			
+
 			if ( !count($forum_moderators) ) {
-				
 				return $lang['Nobody'];
-				
 			}
-			
 		} else {
-			
 			$result = $db->query("SELECT u.id, u.displayed_name, u.level FROM ".TABLE_PREFIX."members u, ".TABLE_PREFIX."moderators m WHERE m.forum_id = ".$forum." AND m.user_id = u.id ORDER BY u.displayed_name");
-			while ( $modsdata = $db->fetch_result($result) )
+
+			while ( $modsdata = $db->fetch_result($result) ) {
 				$forum_moderators[] = $this->make_profile_link($modsdata['id'], $modsdata['displayed_name'], $modsdata['level']);
-				
-			if ( !count($forum_moderators) ) {
-				
-				return $lang['Nobody'];
-				
 			}
-			
+
+			if ( !count($forum_moderators) ) {
+				return $lang['Nobody'];
+			}
 		}
-		
+
 		//
 		// Join all values in the array
 		//
 		return join(', ', $forum_moderators);
-		
 	}
-	
+
 	/**
 	 * Return a clickable list of pages
 	 *
@@ -1815,107 +1786,83 @@ class functions {
 	 * @param bool $force_php Force linking to .php files
 	 * @return string HTML
 	 */
-	function make_page_links($pages_number, $current_page, $items_number, $items_per_page, $page_name, $page_id_val=NULL, $back_forward_links=true, $url_vars=[], $force_php=false) {
-		
+	public function make_page_links(int $pages_number, int $current_page, int $items_number, int $items_per_page, string $page_name, ?int $page_id_val=NULL, bool $back_forward_links=true, array $url_vars=[], bool $force_php=false): string {
 		global $lang;
-		
+
 		if ( intval($items_number) > intval($items_per_page) ) {
-			
 			$page_links = [];
 			$page_links_groups_length = 4;
-			
+
 			if ( !$current_page ) {
-				
 				$current_page = $pages_number+1;
 				$page_links_groups_length++;
-				
 			}
-			
+
 			for ( $i = 1; $i <= $pages_number; $i++ ) {
-				
 				if ( $current_page != $i ) {
-					
 					if ( $i+$page_links_groups_length >= $current_page && $i-$page_links_groups_length <= $current_page ) {
-						
-						if ( valid_int($page_id_val) )
+						if ( valid_int($page_id_val) ) {
 							$url_vars['id'] = $page_id_val;
+						}
+
 						$url_vars['page'] = $i;
 						$page_links[] = '<a href="'.$this->make_url($page_name, $url_vars, true, true, $force_php).'">'.$i.'</a>';
-						
 					} else {
-						
-						if ( end($page_links) != '...' )
+						if ( end($page_links) != '...' ) {
 							$page_links[] = '...';
-						
+						}
 					}
-					
 				} else {
-					
 					$page_links[] = '<strong>'.$i.'</strong>';
-					
 				}
-				
 			}
-			
+
 			$page_links = join(' ', $page_links);
-			
+
 			if ( $back_forward_links ) {
-				
-				if ( valid_int($page_id_val) )
+				if ( valid_int($page_id_val) ) {
 					$url_vars['id'] = $page_id_val;
-				
+				}
+
 				if ( $current_page > 1 ) {
-					
 					$url_vars['page'] = $current_page-1;
 					$page_links = '<a href="'.$this->make_url($page_name, $url_vars, true, true, $force_php).'">&lt;</a> '.$page_links;
-					
 				}
+
 				if ( $current_page < $pages_number ) {
-					
 					$url_vars['page'] = $current_page+1;
 					$page_links .= ' <a href="'.$this->make_url($page_name, $url_vars, true, true, $force_php).'">&gt;</a>';
-					
 				}
+
 				if ( $current_page > 2 ) {
-					
 					$url_vars['page'] = 1;
 					$page_links = '<a href="'.$this->make_url($page_name, $url_vars, true, true, $force_php).'">&laquo;</a> '.$page_links;
-					
 				}
+
 				if ( $current_page+1 < $pages_number ) {
-					
 					$url_vars['page'] = $pages_number;
 					$page_links .= ' <a href="'.$this->make_url($page_name, $url_vars, true, true, $force_php).'">&raquo;</a>';
-					
 				}
-				
 			}
-			
+
 			$page_links = sprintf($lang['PageLinks'], $page_links);
-			
 		} else {
-			
 			$page_links = sprintf($lang['PageLinks'], '1');
-			
 		}
-		
+
 		return $page_links;
-		
 	}
-	
+
 	/**
 	 * Removes BBCode
 	 *
 	 * @param string $string Text string to clean
 	 * @return string Cleaned text
 	 */
-	function bbcode_clear($string) {
-		
-		$existing_tags = array('code', 'b', 'i', 'u', 's', 'img', 'url', 'mailto', 'color', 'size', 'google', 'quote');
-		return preg_replace('#\[/?(?:'.join('|', $existing_tags).')(?:=[^\]]*)?\]#i', '', $string);
-		
+	public function bbcode_clear(string $string): string {
+		return preg_replace('#\[/?(?:'.join('|', self::$existing_tags).')(?:=[^\]]*)?\]#i', '', $string);
 	}
-	
+
 	/**
 	 * Check if a post is empty
 	 *
@@ -1924,21 +1871,17 @@ class functions {
 	 * @param string $string Text
 	 * @return bool Is empty
 	 */
-	function post_empty(&$string) {
-		
-		if ( empty($string) || is_array($string) )
+	public function post_empty(string|array &$string): bool {
+		if ( empty($string) || is_array($string) ) {
 			return true;
-		
+		}
+
 		$copy = $string;
 		$copy = $this->bbcode_clear($copy);
-		
-		if ( empty($copy) )
-			return true;
-		
-		return false;
-		
+
+		return empty($copy);
 	}
-	
+
 	/**
 	 * Cleans up BBCode for parsing
 	 *
@@ -1947,168 +1890,142 @@ class functions {
 	 * @param string $string Text string to preparse
 	 * @return string Corrected BBCoded text
 	 */
-	function bbcode_prepare($string) {
-		
+	public function bbcode_prepare(string $string): string {
 		$string = trim($string);
-		$existing_tags = array('code', 'b', 'i', 'u', 's', 'img', 'url', 'mailto', 'color', 'size', 'google', 'quote');
-		
+
 		//
 		// BBCode tags start with an alphabetic character, eventually followed by non [ and ] characters.
 		//
 		$parts = array_reverse(preg_split('#(\[/?[a-z][^\[\]]*\])#i', $string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY));
-		
+
 		$open_tags = $open_parameters = [];
 		$new_string = '';
-		
+
 		while ( count($parts) ) {
-			
 			$part = array_pop($parts);
 			$matches = [];
-			
+
 			//
 			// Add open tag
 			//
 			if ( preg_match('#^\[([a-z]+)(=[^\]]*)?\]$#i', $part, $matches) ) {
-				
 				$matches[1] = strtolower($matches[1]);
-				
+
 				//
 				// Transform tags
 				//
 				if ( end($open_tags) == 'code' ) {
-					
 					$new_string .= str_replace(array('[', ']'), array('&#91;', '&#93;'), $part);
 					continue;
-					
 				}
-				
+
 				//
 				// Is already open
 				//
-				if ( $matches[1] != 'quote' && in_array($matches[1], $open_tags) )
+				if ( $matches[1] != 'quote' && in_array($matches[1], $open_tags) ) {
 					continue;
-				
+				}
+
 				//
 				// Only add this if it exists
 				//
-				if ( in_array($matches[1], $existing_tags) ) {
-					
+				if ( in_array($matches[1], self::$existing_tags) ) {
 					array_push($open_tags, $matches[1]);
 					array_push($open_parameters, ( isset($matches[2]) ) ? $matches[2] : '');
-					
 				}
-				
+
 				$new_string .= $part;
 				continue;
-				
 			}
-			
+
 			//
 			// Add close tag
 			//
 			if ( preg_match('#^\[/([a-z]+)\]$#i', $part, $matches) ) {
-				
 				$matches[1] = strtolower($matches[1]);
-				
+
 				//
 				// Transform tags
 				//
 				if ( end($open_tags) == 'code' && $matches[1] != 'code' ) {
-					
 					$new_string .= str_replace(array('[', ']'), array('&#91;', '&#93;'), $part);
 					continue;
-					
 				}
-				
+
 				//
 				// Unexisting tag
 				//
-				if ( !in_array($matches[1], $existing_tags) ) {
-					
+				if ( !in_array($matches[1], self::$existing_tags) ) {
 					$new_string .= $part;
 					continue;
-					
 				}
-				
+
 				//
 				// Is current open tag
 				//
 				if ( end($open_tags) == $matches[1] ) {
-					
 					array_pop($open_tags);
 					array_pop($open_parameters);
-					
+
 					$new_string .= $part;
 					continue;
-					
 				}
-				
+
 				//
 				// Is other open tag
 				//
 				if ( in_array($matches[1], $open_tags) ) {
-					
 					$to_reopen_tags = $to_reopen_parameters = [];
-					
+
 					while ( $open_tag = array_pop($open_tags) ) {
-						
 						$open_parameter = array_pop($open_parameters);
 						$new_string .= '[/'.$open_tag.']';
-						
-						if ( $open_tag == $matches[1] )
+
+						if ( $open_tag == $matches[1] ) {
 							break;
-						
+						}
+
 						array_push($to_reopen_tags, $open_tag);
 						array_push($to_reopen_parameters, $open_parameter);
-						
 					}
-					
+
 					$to_reopen_tags = array_reverse($to_reopen_tags);
 					$to_reopen_parameters = array_reverse($to_reopen_parameters);
-					
+
 					while ( $open_tag = array_pop($to_reopen_tags) ) {
-						
 						$open_parameter = array_pop($to_reopen_parameters);
-						
+
 						$new_string .= '['.$open_tag.$open_parameter.']';
 						array_push($open_tags, $open_tag);
 						array_push($open_parameters, $open_parameter);
-						
 					}
-					
 				}
-				
 			} else {
-				
 				//
 				// Plain text
 				//
 				$new_string .= ( end($open_tags) == 'code' && $this->get_config('show_raw_entities_in_code') ) ? str_replace('&#', '&amp;#', $part) : $part;
-				
 			}
-			
 		}
-		
+
 		//
 		// Close opened tags
 		//
 		while ( $open_tag = array_pop($open_tags) ) {
-			
 			$open_parameter = array_pop($open_parameters);
 			$new_string .= '[/'.$open_tag.$open_parameter.']';
-			
 		}
-		
+
 		//
 		// Remove empties
 		//
-		foreach ( $existing_tags as $existing_tag )
+		foreach ( self::$existing_tags as $existing_tag ) {
 			$new_string = preg_replace('#\[('.$existing_tag.')([^\]]+)?\]\[/(\1)\]#i', '', $new_string);
-		
+		}
+
 		return $new_string;
-		
 	}
-	
+
 	/**
 	 * Apply BBCode and smilies to a string
 	 *
@@ -2120,283 +2037,273 @@ class functions {
 	 * @param bool $links Enable links parsing
 	 * @return string HTML
 	 */
-	function markup(string $string, bool $bbcode=true, bool $smilies=true, bool $html=false, bool $rss_mode=false, bool $links=true): string {
-		
+	public function markup(string $string, bool $bbcode=true, bool $smilies=true, bool $html=false, bool $rss_mode=false, bool $links=true): string {
 		global $db, $template, $lang;
+
 		static $random;
-		
+
 		$string = preg_replace('#(script|about|applet|activex|chrome):#is', '\\1&#058;', $string);
-		
+
 		//
 		// Needed by some BBCode regexps and smilies
 		//
 		$string = ' '.$string.' ';
-		
-		if ( !$html )
+
+		if ( !$html ) {
 			$string = unhtml($string, $rss_mode);
-		
+		}
+
 		if ( $smilies ) {
-			
 			$all_smilies = $template->get_config('smilies');
 			krsort($all_smilies);
 			$full_path = ( $rss_mode ) ? $this->get_config('board_url') : ROOT_PATH;
-			
-			foreach ( $all_smilies as $pattern => $img )
+
+			foreach ( $all_smilies as $pattern => $img ) {
 				$string = preg_replace('#([^"])('.preg_quote(unhtml($pattern), '#').')#', '\\1<img src="'.$full_path.'templates/'.$this->get_config('template').'/smilies/'.$img.'" alt="'.unhtml($pattern).'" />', $string);
-			
+			}
+
 			//
 			// Entity + smiley fix
 			//
 			$string = preg_replace('#(&\#?[a-zA-Z0-9]+)<img src="[^"]+" alt="([^"]+)" />#', '\\1\\2', $string);
-			
 		}
-		
+
 		if ( $bbcode ) {
-			
 			$string = ' '.$this->bbcode_prepare($string).' ';
-			
+
 			$rel = [];
-			if ( $this->get_config('target_blank') )
+
+			if ( $this->get_config('target_blank') ) {
 				$rel[] = 'external';
-			if ( $this->get_config('rel_nofollow') )
+			}
+
+			if ( $this->get_config('rel_nofollow') ) {
 				$rel[] = 'nofollow';
+			}
+
 			$rel = ( count($rel) ) ? ' rel="'.join(' ', $rel).'"' : '';
-			
+
 			//
- 			// Protect from infinite loops.
- 			// The while loop to parse nested quote tags has the sad side-effect of entering an infinite loop
- 			// when the parsed text contains $0 or \0.
- 			// Admittedly, this is a quick and dirty fix. For a nice "fix" I refer to the stack based parser in 2.0.
- 			//
- 			if ( $random == NULL )
- 				$random = $this->random_key();
- 			
- 			$string = str_replace(array('$', "\\"), array('&#36;'.$random, '&#92;'.$random), $string);
-			
+			// Protect from infinite loops.
+			// The while loop to parse nested quote tags has the sad side-effect of entering an infinite loop
+			// when the parsed text contains $0 or \0.
+			// Admittedly, this is a quick and dirty fix. For a nice "fix" I refer to the stack based parser in 2.0.
+			//
+			if ( $random == NULL ) {
+				$random = $this->random_key();
+			}
+
+			$string = str_replace(array('$', "\\"), array('&#36;'.$random, '&#92;'.$random), $string);
+
 			//
 			// Parse quote tags
 			//
 			// Might seem a bit difficultly done, but trimming doesn't work the usual way
 			//
 			while ( preg_match("#\[quote\](.*?)\[/quote\]#is", $string, $matches) ) {
-
 				$string = preg_replace("#\[quote\]".preg_quote($matches[1], '#')."\[/quote\]#is", sprintf($template->get_config('quote_format'), $lang['Quote'], ' '.trim($matches[1])).' ', $string);
 				unset($matches);
-
 			}
-			while ( preg_match("#\[quote=(.*?)\](.*?)\[/quote\]#is", $string, $matches) ) {
 
+			while ( preg_match("#\[quote=(.*?)\](.*?)\[/quote\]#is", $string, $matches) ) {
 				$string = preg_replace("#\[quote=".preg_quote($matches[1], '#')."\]".preg_quote($matches[2], '#')."\[/quote\]#is", sprintf($template->get_config('quote_format'), sprintf($lang['Wrote'], $matches[1]), ' '.trim($matches[2]).' '), $string);
 				unset($matches);
-
 			}
-			
+
 			//
 			// Undo the dirty fixing.
- 			//
- 			$string = str_replace(array('&#36;'.$random, '&#92;'.$random), array('$', "\\"), $string);
-			
+			//
+			$string = str_replace(array('&#36;'.$random, '&#92;'.$random), array('$', "\\"), $string);
+
 			//
 			// Parse code tags
 			//
-			preg_match_all("#\[code\](.*?)\[/code\]#is", $string, $matches);				
+			preg_match_all("#\[code\](.*?)\[/code\]#is", $string, $matches);
 			foreach ( $matches[1] as $oldpart ) {
-				
 				$newpart = preg_replace(array('#<img src="[^"]+" alt="([^"]+)" />#', "#\n#", "#\r#"), array('\\1', '<br />', ''), $oldpart); // replace smiley image tags
 				$string = str_replace('[code]'.$oldpart.'[/code]', '[code]'.$newpart.'[/code]', $string);
-				
 			}
+
 			$string = preg_replace("#\[code\](.*?)\[/code\]#is", sprintf($template->get_config('code_format'), '\\1'), $string);
-			
+
 			//
 			// Parse URL's and e-mail addresses enclosed in special characters
 			//
 			if ( $links ) {
-
 				$ignore_chars = "([^a-z0-9/]|&\#?[a-z0-9]+;)*?";
-				for ( $i = 0; $i < 2; $i++ ) {
 
-					$string = preg_replace(array(
+				for ( $i = 0; $i < 2; $i++ ) {
+					$string = preg_replace([
 						"#([\s]".$ignore_chars.")([\w]+?://[\w\#\$%&~/\.\-;:=,\?@\[\]\+\\\\\'!\(\)\*]*?)(".$ignore_chars."[\s])#is",
 						"#([\s]".$ignore_chars.")(www\.[\w\#\$%&~/\.\-;:=,\?@\[\]\+\\\\\'!\(\)\*]*?)(".$ignore_chars."[\s])#is",
 						"#([\s]".$ignore_chars.")([a-z0-9&\-_\.\+]+?@[\w\-]+\.([\w\-\.]+\.)?[\w]+)(".$ignore_chars."[\s])#is"
-					), array(
+					], [
 						'\\1<a href="\\3" title="\\3"'.$rel.'>\\3</a>\\4',
 						'\\1<a href="http://\\3" title="http://\\3"'.$rel.'>\\3</a>\\4',
 						'\\1<a href="mailto:\\2" title="\\3">\\3</a>\\5'
-					), $string);
-
+					], $string);
 				}
-
 			}
-			
+
 			//
 			// All kinds of BBCode regexps
 			//
-			$regexps = array(
+			$regexps = [
 				// [b]text[/b]
-					"#\[b\](.*?)\[/b\]#is" => '<strong>\\1</strong>',
+				"#\[b\](.*?)\[/b\]#is" => '<strong>\\1</strong>',
 				// [i]text[/i]
-					"#\[i\](.*?)\[/i\]#is" => '<em>\\1</em>',
+				"#\[i\](.*?)\[/i\]#is" => '<em>\\1</em>',
 				// [u]text[/u]
-					"#\[u\](.*?)\[/u\]#is" => '<span style="text-decoration:underline">\\1</span>',
+				"#\[u\](.*?)\[/u\]#is" => '<span style="text-decoration:underline">\\1</span>',
 				// [s]text[/s]
-					"#\[s\](.*?)\[/s\]#is" => '<del>\\1</del>',
+				"#\[s\](.*?)\[/s\]#is" => '<del>\\1</del>',
 				// [img]image[/img]
-					"#\[img\]([\w]+?://[\w\#\$%&~/\.\-;:=,\?@\[\]\+\\\\\'!\(\)\*]*?)\[/img\]#is" => ( $links ) ? '<img src="\\1" alt="'.$lang['UserPostedImage'].'" class="user-posted-image" />' : '\\1',
+				"#\[img\]([\w]+?://[\w\#\$%&~/\.\-;:=,\?@\[\]\+\\\\\'!\(\)\*]*?)\[/img\]#is" => ( $links ) ? '<img src="\\1" alt="'.$lang['UserPostedImage'].'" class="user-posted-image" />' : '\\1',
 				// www.usebb.net
-					"#([\s])(www\.[\w\#\$%&~/\.\-;:=,\?@\[\]\+\\\\\'!\(\)\*]*?)#is" => ( $links ) ? '\\1<a href="http://\\2" title="http://\\2"'.$rel.'>\\2</a>\\3' : '\\1\\2\\3',
+				"#([\s])(www\.[\w\#\$%&~/\.\-;:=,\?@\[\]\+\\\\\'!\(\)\*]*?)#is" => ( $links ) ? '\\1<a href="http://\\2" title="http://\\2"'.$rel.'>\\2</a>\\3' : '\\1\\2\\3',
 				// ftp.usebb.net
-					"#([\s])(ftp\.[\w\#\$%&~/\.\-;:=,\?@\[\]\+\\\\\'!\(\)\*]*?)([\s])#is" => ( $links ) ? '\\1<a href="ftp://\\2" title="ftp://\\2"'.$rel.'>\\2</a>\\3' : '\\1\\2\\3',
+				"#([\s])(ftp\.[\w\#\$%&~/\.\-;:=,\?@\[\]\+\\\\\'!\(\)\*]*?)([\s])#is" => ( $links ) ? '\\1<a href="ftp://\\2" title="ftp://\\2"'.$rel.'>\\2</a>\\3' : '\\1\\2\\3',
 				// [url]http://www.usebb.net[/url]
-					"#\[url\]([\w]+?://[\w\#\$%&~/\.\-;:=,\?@\[\]\+\\\\\'!\(\)\*]*?)\[/url\]#is" => ( $links ) ? '<a href="\\1" title="\\1"'.$rel.'>\\1</a>' : '\\1',
+				"#\[url\]([\w]+?://[\w\#\$%&~/\.\-;:=,\?@\[\]\+\\\\\'!\(\)\*]*?)\[/url\]#is" => ( $links ) ? '<a href="\\1" title="\\1"'.$rel.'>\\1</a>' : '\\1',
 				// [url=http://www.usebb.net]UseBB[/url]
-					"#\[url=([\w]+?://[\w\#\$%&~/\.\-;:=,\?@\[\]\+\\\\\'!\(\)\*]*?)\](.*?)\[/url\]#is" => ( $links ) ? '<a href="\\1" title="\\1"'.$rel.'>\\2</a>' : '\\2 [\\1]',
+				"#\[url=([\w]+?://[\w\#\$%&~/\.\-;:=,\?@\[\]\+\\\\\'!\(\)\*]*?)\](.*?)\[/url\]#is" => ( $links ) ? '<a href="\\1" title="\\1"'.$rel.'>\\2</a>' : '\\2 [\\1]',
 				// [mailto]somebody@nonexistent.com[/mailto]
-					"#\[mailto\]([a-z0-9&\-_\.\+]+?@[\w\-]+\.([\w\-\.]+\.)?[\w]+)\[/mailto\]#is" => ( $links ) ? '<a href="mailto:\\1" title="\\1">\\1</a>' : '\\1',
+				"#\[mailto\]([a-z0-9&\-_\.\+]+?@[\w\-]+\.([\w\-\.]+\.)?[\w]+)\[/mailto\]#is" => ( $links ) ? '<a href="mailto:\\1" title="\\1">\\1</a>' : '\\1',
 				// [mailto=somebody@nonexistent.com]mail me[/mailto]
-					"#\[mailto=([a-z0-9&\-_\.\+]+?@[\w\-]+\.([\w\-\.]+\.)?[\w]+)\](.*?)\[/mailto\]#is" => ( $links ) ? '<a href="mailto:\\1" title="\\1">\\3</a>' : '\\3 [\\1]',
+				"#\[mailto=([a-z0-9&\-_\.\+]+?@[\w\-]+\.([\w\-\.]+\.)?[\w]+)\](.*?)\[/mailto\]#is" => ( $links ) ? '<a href="mailto:\\1" title="\\1">\\3</a>' : '\\3 [\\1]',
 				// [color=red]text[/color]
-					"#\[color=([\#a-z0-9]+)\](.*?)\[/color\]#is" => '<span style="color:\\1">\\2</span>',
+				"#\[color=([\#a-z0-9]+)\](.*?)\[/color\]#is" => '<span style="color:\\1">\\2</span>',
 				// [size=999]too big text[/size]
-					"#\[size=([0-9]{3,})\](.*?)\[/size\]#is" => '\\2',
+				"#\[size=([0-9]{3,})\](.*?)\[/size\]#is" => '\\2',
 				// [size=14]text[/size]
-					"#\[size=([0-9]*?)\](.*?)\[/size\]#is" => '<span style="font-size:\\1pt">\\2</span>',
+				"#\[size=([0-9]*?)\](.*?)\[/size\]#is" => '<span style="font-size:\\1pt">\\2</span>',
 				// [google=keyword]text[/google]
-					"#\[google=(.*?)\](.*?)\[/google\]#is" => '<a href="http://www.google.com/search?q=\\1"'.$rel.'>\\2</a>',
-			);
-			
+				"#\[google=(.*?)\](.*?)\[/google\]#is" => '<a href="http://www.google.com/search?q=\\1"'.$rel.'>\\2</a>',
+			];
+
 			//
 			// Now parse those regexps
 			//
-			foreach ( $regexps as $find => $replace )
+			foreach ( $regexps as $find => $replace ) {
 				$string = preg_replace($find, $replace, $string);
-			
+			}
+
 			//
 			// Remove tags from attributes
 			//
 			if ( strpos($string, '<') !== false ) {
-	
 				preg_match_all('#[a-z]+="[^"]*<[^>]*>[^"]*"#', $string, $matches);
-	
-				foreach ( $matches[0] as $match )
+
+				foreach ( $matches[0] as $match ) {
 					$string = str_replace($match, strip_tags($match), $string);
-	
+				}
 			}
-			
 		}
-		
+
 		if ( !$html ) {
-			
 			$string = str_replace("\n", "<br />", $string);
 			$string = str_replace("\r", "", $string);
-			
 		}
-		
+
 		//
 		// XML (RSS/Atom) does not define elements such as a, pre, etc.
 		// Though, make sure the already escaped < and > are still/double escaped.
 		//
-		if ( $rss_mode )
+		if ( $rss_mode ) {
 			$string = str_replace(array('&lt;', '&gt;', '<', '>'), array('&amp;lt;', '&amp;gt;', '&lt;', '&gt;'), $string);
-		
+		}
+
 		return trim($string);
-		
 	}
-	
+
 	/**
 	 * Return the BBCode control buttons
 	 *
 	 * @param bool $links Enable controls for links
 	 * @return string HTML BBCode controls
 	 */
-	function get_bbcode_controls($links=true) {
-		
+	public function get_bbcode_controls(bool $links=true): string {
 		global $lang, $template;
-		
-		$controls = array(
-			array('[b]', '[/b]', 'B', 'font-weight: bold'),
-			array('[i]', '[/i]', 'I', 'font-style: italic'),
-			array('[u]', '[/u]', 'U', 'text-decoration: underline'),
-			array('[s]', '[/s]', 'S', 'text-decoration: line-through'),
-			array('[quote]', '[/quote]', $lang['Quote'], ''),
-			array('[code]', '[/code]', $lang['Code'], ''),
-		);
+
+		$controls = [
+			['[b]', '[/b]', 'B', 'font-weight: bold'],
+			['[i]', '[/i]', 'I', 'font-style: italic'],
+			['[u]', '[/u]', 'U', 'text-decoration: underline'],
+			['[s]', '[/s]', 'S', 'text-decoration: line-through'],
+			['[quote]', '[/quote]', $lang['Quote'], ''],
+			['[code]', '[/code]', $lang['Code'], ''],
+		];
 
 		if ( $links ) {
-
-			$controls = array_merge($controls, array(
-				array('[img]', '[/img]', $lang['Img'], ''),
-				array('[url=http://www.example.com]', '[/url]', $lang['URL'], ''),
-			));
-
+			$controls = array_merge($controls, [
+				['[img]', '[/img]', $lang['Img'], ''],
+				['[url=http://www.example.com]', '[/url]', $lang['URL'], ''],
+			]);
 		}
 
-		$controls = array_merge($controls, array(
-			array('[color=red]', '[/color]', $lang['Color'], ''),
-			array('[size=14]', '[/size]', $lang['Size'], '')
+		$controls = array_merge($controls, [
+			['[color=red]', '[/color]', $lang['Color'], ''],
+			['[size=14]', '[/size]', $lang['Size'], ''],
 		));
-		
+
 		$out = [];
-		foreach ( $controls as $data )
+		foreach ( $controls as $data ) {
 			$out[] = '<a href="javascript:void(0);" onclick="insert_tags(\''.$data[0].'\', \''.$data[1].'\')" style="'.$data[3].'">'.$data[2].'</a>';
-		
+		}
+
 		return join($template->get_config('post_form_bbcode_seperator'), $out);
-		
 	}
-	
+
 	/**
 	 * Return the smiley control graphics
 	 *
 	 * @return string HTML smiley controls
 	 */
-	function get_smiley_controls() {
-		
+	public function get_smiley_controls(): string {
 		global $template;
-		
+
 		$smilies = $template->get_config('smilies');
 		$smilies = array_unique($smilies);
 		$out = [];
-		foreach ( $smilies as $pattern => $img )
+
+		foreach ( $smilies as $pattern => $img ) {
 			$out[] = '<a href="javascript:void(0)" onclick="insert_smiley(\''.addslashes(unhtml($pattern)).'\')"><img src="templates/'.$this->get_config('template').'/smilies/'.$img.'" alt="'.unhtml($pattern).'" /></a>';
-		
+		}
+
 		return join($template->get_config('post_form_smiley_seperator'), $out);
-		
 	}
-	
+
 	/**
 	 * Censor text
 	 *
 	 * @param string $string Text to censor
 	 * @return string Censored text
 	 */
-	function replace_badwords($string) {
-		
+	public function replace_badwords(string $string): string {
 		global $db;
-		
+
 		if ( $this->get_config('enable_badwords_filter') ) {
-			
 			//
 			// Algorithm borrowed from phpBB
 			//
 			if ( !isset($this->badwords) ) {
-				
 				$result = $db->query("SELECT word, replacement FROM ".TABLE_PREFIX."badwords ORDER BY word ASC");
+
 				$this->badwords = [];
-				while ( $data = $db->fetch_result($result) )
+
+				while ( $data = $db->fetch_result($result) ) {
 					$this->badwords['#\b(?:' . str_replace('\*', '\w*?', preg_quote(stripslashes($data['word']), '#')) . ')\b#i'] = stripslashes($data['replacement']);
-				
+				}
 			}
-			
-			foreach ( $this->badwords as $badword => $replacement )
+
+			foreach ( $this->badwords as $badword => $replacement ) {
 				$string = preg_replace($badword, $replacement, $string);
-			
+			}
 		}
-		
+
 		return $string;
-		
 	}
-	
+
 	/**
 	 * Timezone handling
 	 *
@@ -2404,54 +2311,16 @@ class functions {
 	 * @param mixed $param Time zone param for 'check_existance'
 	 * @return mixed Array with timezones or bool
 	 */
-	function timezone_handler($action, $param=NULL) {
-		
-		$timezones = array(
-			'-12' => '-12:00',
-			'-11' => '-11:00',
-			'-10' => '-10:00',
-			'-9' => '-9:00',
-			'-8' => '-8:00',
-			'-7' => '-7:00',
-			'-6' => '-6:00',
-			'-5' => '-5:00',
-			'-4' => '-4:00',
-			'-3.5' => '-3:30',
-			'-3' => '-3:00',
-			'-2' => '-2:00',
-			'-1' => '-1:00',
-			'0' => '+0:00',
-			'+1' => '+1:00',
-			'+2' => '+2:00',
-			'+3' => '+3:00',
-			'+3.5' => '+3:30',
-			'+4' => '+4:00',
-			'+4.5' => '+4:30',
-			'+5' => '+5:00',
-			'+5.5' => '+5:30',
-			'+6' => '+6:00',
-			'+7' => '+7:00',
-			'+8' => '+8:00',
-			'+9' => '+9:00',
-			'+9.5' => '+9:30',
-			'+10' => '+10:00',
-			'+11' => '+11:00',
-			'+12' => '+12:00',
-		);
-		
+	public function timezone_handler(string $action, mixed $param=null): array|bool {
 		if ( $action == 'get_zones' ) {
-			
-			return $timezones;
-			
+			return self::$timezones;
 		} elseif ( $action == 'check_existance' ) {
-			
-			if ( !empty($timezones[$param]) )
+			if ( !empty(self::$timezones[$param]) ) {
 				return true;
-			else
+			} else {
 				return false;
-			
+			}
 		}
-		
 	}
 
 	/**
@@ -2463,120 +2332,106 @@ class functions {
 	 * @param string $title Title attribute
 	 * @return string HTML
 	 */
-	function make_profile_link($user_id, $username, $level, $title=null) {
-		
+	public function make_profile_link(int $user_id, string $username, int $level, ?string $title=null): string {
 		switch ( $level ) {
-			
 			case LEVEL_ADMIN:
 				$levelclass = ' class="administrator"';
 				break;
+
 			case LEVEL_MOD:
 				$levelclass = ' class="moderator"';
 				break;
+
 			case LEVEL_MEMBER:
 				$levelclass = '';
 				break;
+
 			default:
 				trigger_error('User ID '.$user_id.' has a level of '.$level.' which is not possible within UseBB.', E_USER_ERROR);
-			
 		}
-		
+
 		$title = ( !empty($title) ) ? ' title="'.unhtml($title).'"' : '';
-		
+
 		return '<a href="'.$this->make_url('profile.php', array('id' => $user_id)).'"'.$levelclass.$title.'>'.unhtml(stripslashes($username)).'</a>';
-		
 	}
-	
+
 	/**
 	 * Create a forum statistics box like on the forum index
 	 */
-	function forum_stats_box() {
-		
+	public function forum_stats_box(): void {
 		global $db, $template, $lang, $session;
-		
+
 		if ( $this->get_config('enable_forum_stats_box') && $this->get_user_level() >= $this->get_config('view_forum_stats_box_min_level') ) {
-			
 			//
 			// Timestamp for defining last updated sessions
 			//
 			$min_updated = time() - ( $this->get_config('online_min_updated') * 60 );
-			
+
 			//
 			// Get the session and user information
 			//
 			$result = $db->query("SELECT u.displayed_name, u.level, u.hide_from_online_list, s.user_id AS id, s.ip_addr, s.updated FROM ( ".TABLE_PREFIX."sessions s LEFT JOIN ".TABLE_PREFIX."members u ON s.user_id = u.id ) WHERE s.updated > ".$min_updated." ORDER BY s.updated DESC");
-			
+
 			//
 			// Arrays for holding a list of online guests and members.
 			//
-			$count = array(
+			$count = [
 				'total_members' => 0,
 				'hidden_members' => 0,
 				'guests' => 0
-			);
-			$list = array(
+			];
+			$list = [
 				'members' => [],
 				'guests' => []
-			);
+			];
+
 			$memberlist = [];
-			
+
 			while ( $onlinedata = $db->fetch_result($result) ) {
-				
 				if ( !$onlinedata['id'] ) {
-					
 					//
 					// This is a guest
 					// Guests will only be counted per IP address
 					//
 					if ( !in_array($onlinedata['ip_addr'], $list['guests']) ) {
-						
 						$count['guests']++;
 						$list['guests'][] = $onlinedata['ip_addr'];
-						
 					}
-					
 				} else {
-					
 					//
 					// This is a member
 					//
 					if ( !in_array($onlinedata['id'], $list['members']) ) {
-						
 						$title = $this->make_date($onlinedata['updated'], 'h:i:s a');
-						
+
 						if ( !$onlinedata['hide_from_online_list'] ) {
-							
 							$memberlist[] = $this->make_profile_link($onlinedata['id'], $onlinedata['displayed_name'], $onlinedata['level'], $title);
-							
 						} else {
-							
-							if ( $this->get_user_level() == LEVEL_ADMIN )
+							if ( $this->get_user_level() == LEVEL_ADMIN ) {
 								$memberlist[] = '<em>'.$this->make_profile_link($onlinedata['id'], $onlinedata['displayed_name'], $onlinedata['level'], $title).'</em>';
-							
+							}
+
 							$count['hidden_members']++;
-							
 						}
-						
+
 						$count['total_members']++;
 						$list['members'][] = $onlinedata['id'];
-						
 					}
-					
 				}
-				
 			}
-			
+
 			$latest_member = $this->get_stats('latest_member');
-			
-			if ( $count['total_members'] === 1 && $count['guests'] === 1 )
+
+			if ( $count['total_members'] === 1 && $count['guests'] === 1 ) {
 				$users_online = $lang['MemberGuestOnline'];
-			elseif ( $count['total_members'] !== 1 && $count['guests'] === 1 )
+			} elseif ( $count['total_members'] !== 1 && $count['guests'] === 1 ) {
 				$users_online = $lang['MembersGuestOnline'];
-			elseif ( $count['total_members'] === 1 && $count['guests'] !== 1 )
+			} elseif ( $count['total_members'] === 1 && $count['guests'] !== 1 ) {
 				$users_online = $lang['MemberGuestsOnline'];
-			else
+			} else {
 				$users_online = $lang['MembersGuestsOnline'];
-			
+			}
+
 			//
 			// Parse the online box
 			//
@@ -2587,62 +2442,54 @@ class functions {
 				'members_online' => ( count($memberlist) ) ? join(', ', $memberlist) : '',
 				'detailed_list_link' => ( $this->get_config('enable_detailed_online_list') && $this->get_user_level() >= $this->get_config('view_detailed_online_list_min_level') ) ? '<a href="'.$this->make_url('online.php').'">'.$lang['Detailed'].'</a>' : ''
 			));
-			
 		}
-		
 	}
-	
+
 	/**
 	 * Get the server's load avarage value
 	 *
-	 * @param integer $which What load variable to call ('all' for an array of all)
+	 * @param int $which What load variable to call ('all' for an array of all)
 	 * @return float Server load average
 	 */
-	function get_server_load($which=1) {
-		
+	public function get_server_load(int $which=1): float {
 		//
 		// Afaik, this does not exist at Windows
 		//
-		if ( ON_WINDOWS )
+		if ( ON_WINDOWS ) {
 			return false;
-		
+		}
+
 		//
 		// Load has not been requested yet
 		//
 		if ( is_null($this->server_load) ) {
-			
 			$found_load = false;
-			
+
 			//
 			// First attempt: reading /proc/loadavg
 			//
 			$file = '/proc/loadavg';
+
 			if ( file_exists($file) && is_readable($file) ) {
-				
 				$fh = fopen($file, 'r');
-				
+
 				if ( is_resource($fh) ) {
-					
 					$out = fread($fh, 1024);
 					fclose($fh);
-					
+
 					if ( preg_match('#([0-9]+\.[0-9]{2}) ([0-9]+\.[0-9]{2}) ([0-9]+\.[0-9]{2})#', $out, $match) ) {
-						
-						$this->server_load = array(
-							(float)$match[1],
-							(float)$match[2],
-							(float)$match[3]
-						);
+						$this->server_load = [
+							(float) $match[1],
+							(float) $match[2],
+							(float) $match[3]
+						];
+
 						$found_load = true;
-						
 					}
-					
 				}
-				
 			}
-			
+
 			if ( !$found_load ) {
-				
 				//
 				// Second attempt: executing uptime
 				//
@@ -2650,42 +2497,32 @@ class functions {
 				$retval = 1;
 				$out = exec('uptime', $tmp, $retval);
 				unset($tmp);
-				
+
 				if ( !$retval ) {
-					
 					if ( preg_match('#([0-9]+\.[0-9]{2}),? ([0-9]+\.[0-9]{2}),? ([0-9]+\.[0-9]{2})#', $out, $match) ) {
-						
-						$this->server_load = array(
-							(float)$match[1],
-							(float)$match[2],
-							(float)$match[3]
-						);
-						
+						$this->server_load = [
+							(float) $match[1],
+							(float) $match[2],
+							(float) $match[3]
+						];
 					} else {
-						
 						$this->server_load = false;
-						
 					}
-					
 				} else {
-					
 					$this->server_load = false;
-					
 				}
-				
 			}
-			
 		}
-		
-		if ( !$this->server_load )
+
+		if ( !$this->server_load ) {
 			return false;
-		elseif ( $which == 'all' )
+		} elseif ( $which == 'all' ) {
 			return $this->server_load;
-		elseif ( is_int($which) )
+		} elseif ( is_int($which) ) {
 			return $this->server_load[$which-1];
-		
+		}
 	}
-	
+
 	/**
 	 * Define the icon for forums
 	 *
@@ -2694,57 +2531,42 @@ class functions {
 	 * @param int $post_time Unix timestamp of update
 	 * @return array Array with forum icon and status
 	 */
-	function forum_icon($id, $open, $post_time) {
-		
+	public function forum_icon(int $id, bool $open, int $post_time): array {
 		global $db, $session, $template, $lang;
-		
+
 		if ( $session->sess_info['user_id'] && !empty($_SESSION['previous_visit']) && !is_array($this->updated_forums) ) {
-			
 			$result = $db->query("SELECT t.id, t.forum_id, p.post_time FROM ".TABLE_PREFIX."topics t, ".TABLE_PREFIX."posts p WHERE p.id = t.last_post_id AND p.post_time > ".$_SESSION['previous_visit']);
+
 			$this->updated_forums = [];
+
 			while ( $topicsdata = $db->fetch_result($result) ) {
-				
-				if ( !in_array($topicsdata['forum_id'], $this->updated_forums) && ( !isset($_SESSION['viewed_topics']['t'.$topicsdata['id']]) || $_SESSION['viewed_topics']['t'.$topicsdata['id']] < $topicsdata['post_time'] ) )
+				if ( !in_array($topicsdata['forum_id'], $this->updated_forums) && ( !isset($_SESSION['viewed_topics']['t'.$topicsdata['id']]) || $_SESSION['viewed_topics']['t'.$topicsdata['id']] < $topicsdata['post_time'] ) ) {
 					$this->updated_forums[] = $topicsdata['forum_id'];
-				
+				}
 			}
-			
 		}
-		
+
 		if ( $session->sess_info['user_id'] && !empty($_SESSION['previous_visit']) && in_array($id, $this->updated_forums) ) {
-			
 			if ( $open ) {
-				
 				$forum_icon = $template->get_config('open_newposts_icon');
 				$forum_status = $lang['NewPosts'];
-				
 			} else {
-				
 				$forum_icon = $template->get_config('closed_newposts_icon');
 				$forum_status = $lang['LockedNewPosts'];
-				
 			}
-			
 		} else {
-			
 			if ( $open ) {
-				
 				$forum_icon = $template->get_config('open_nonewposts_icon');
 				$forum_status = $lang['NoNewPosts'];
-				
 			} else {
-				
 				$forum_icon = $template->get_config('closed_nonewposts_icon');
 				$forum_status = $lang['LockedNoNewPosts'];
-				
 			}
-			
 		}
-		
+
 		return array($forum_icon, $forum_status);
-		
 	}
-	
+
 	/**
 	 * Define the icon for topics
 	 *
@@ -2753,42 +2575,28 @@ class functions {
 	 * @param int $post_time Unix timestamp of update
 	 * @return array Array with topic icon and status
 	 */
-	function topic_icon($id, $locked, $post_time) {
-		
+	public function topic_icon(int $id, bool $locked, int $post_time): array {
 		global $session, $template, $lang;
-		
+
 		if ( $session->sess_info['user_id'] && !empty($_SESSION['previous_visit']) && $_SESSION['previous_visit'] < $post_time && ( !isset($_SESSION['viewed_topics']['t'.$id]) || $_SESSION['viewed_topics']['t'.$id] < $post_time ) ) {
-			
 			if ( !$locked ) {
-				
 				$topic_icon = $template->get_config('open_newposts_icon');
 				$topic_status = $lang['NewPosts'];
-				
 			} else {
-				
 				$topic_icon = $template->get_config('closed_newposts_icon');
 				$topic_status = $lang['LockedNewPosts'];
-				
 			}
-			
 		} else {
-			
 			if ( !$locked ) {
-				
 				$topic_icon = $template->get_config('open_nonewposts_icon');
 				$topic_status = $lang['NoNewPosts'];
-				
 			} else {
-				
 				$topic_icon = $template->get_config('closed_nonewposts_icon');
 				$topic_status = $lang['LockedNoNewPosts'];
-				
 			}
-			
 		}
-		
+
 		return array($topic_icon, $topic_status);
-		
 	}
 	
 	/**
@@ -2797,86 +2605,76 @@ class functions {
 	 * @param string $input Input birthday field
 	 * @return array Input fields
 	 */
-	function birthday_input_fields($input) {
-		
+	public function birthday_input_fields(string $input): array {
 		global $lang;
+
 		$months = array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
-		
+
 		if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
-			
 			$birthday_year = $_POST['birthday_year'];
 			$birthday_month = $_POST['birthday_month'];
 			$birthday_day = $_POST['birthday_day'];
-			
 		} else {
-			
 			$birthday = $input;
 			$birthday_year = ( $birthday ) ? intval(substr($birthday, 0, 4)) : '';
 			$birthday_month = ( $birthday ) ? intval(substr($birthday, 4, 2)) : 0;
 			$birthday_day = ( $birthday ) ? intval(substr($birthday, 6, 2)) : 0;
-			
 		}
+
 		$birthday_month_input = '<select name="birthday_month"><option value="">'.$lang['Month'].'</option>';
+
 		for ( $i = 1; $i <= 12; $i++ ) {
-			
 			$selected = ( $birthday_month == $i ) ? ' selected="selected"' : '';
 			$month_name = ( isset($lang['date_translations']) && is_array($lang['date_translations']) ) ? $lang['date_translations'][$months[$i-1]] : $months[$i-1];
 			$birthday_month_input .= '<option value="'.$i.'"'.$selected.'>'.$month_name.'</option>';
-			
 		}
+
 		$birthday_month_input .= '</select>';
 		$birthday_day_input = '<select name="birthday_day"><option value="">'.$lang['Day'].'</option>';
+
 		for ( $i = 1; $i <= 31; $i++ ) {
-			
 			$selected = ( $birthday_day == $i ) ? ' selected="selected"' : '';
 			$birthday_day_input .= '<option value="'.$i.'"'.$selected.'>'.$i.'</option>';
-			
 		}
+
 		$birthday_day_input .= '</select>';
 		$birthday_year_input = '<select name="birthday_year"><option value="">'.$lang['Year'].'</option>';
+
 		for ( $i = intval(date('Y')); $i >= 1900; $i-- ) {
-			
 			$selected = ( $birthday_year == $i ) ? ' selected="selected"' : '';
 			$birthday_year_input .= '<option value="'.$i.'"'.$selected.'>'.$i.'</option>';
-			
 		}
+
 		$birthday_year_input .= '</select>';
-		
+
 		return array($birthday_year_input, $birthday_month_input, $birthday_day_input);
-		
 	}
-	
+
 	/**
 	 * Calculate the age of a person based on a birthday date
 	 *
 	 * @param int $birthday Unix timestamp
 	 * @return int Age
 	 */
-	function calculate_age($birthday) {
-		
+	public function calculate_age(int $birthday): int {
 		$month = intval(substr($birthday, 4, 2));
 		$day = intval(substr($birthday, 6, 2));
 		$year = intval(substr($birthday, 0, 4));
-		
+
 		//
 		// Because Windows doesn't allow dates before 1970 with mktime(),
 		// we perform a trick to calculate dates before 1970.
 		//
 		if ( $year < 1970 ) {
-			
 			$years_before_unix_epoch = 1970 - $year;
 			$false_year = $year + ( $years_before_unix_epoch * 2 );
 			$timestamp = mktime(0, 0, 0, $month, $day, $false_year);
 			$timestamp -= ( $years_before_unix_epoch * 31556926 * 2 );
-			
 		} else {
-			
 			$timestamp = mktime(0, 0, 0, $month, $day, $year);
-			
 		}
-		
+
 		return floor((time()-$timestamp)/31556926);
-		
 	}
 	
 	/**
@@ -2884,72 +2682,61 @@ class functions {
 	 *
 	 * @return array List of available template sets
 	 */
-	function get_template_sets() {
-		
+	public function get_template_sets(): array {
 		if ( !count($this->available['templates']) ) {
-			
 			$handle = opendir(ROOT_PATH.'templates');
+
 			while ( false !== ( $template_name = readdir($handle) ) ) {
-				
-				if ( is_dir(ROOT_PATH.'templates/'.$template_name) && is_readable(ROOT_PATH.'templates/'.$template_name) && ( $this->get_user_level() == LEVEL_ADMIN || preg_match('#^[^\.]#', $template_name) ) && file_exists(ROOT_PATH.'templates/'.$template_name.'/global.tpl.php') )
+				if ( is_dir(ROOT_PATH.'templates/'.$template_name) && is_readable(ROOT_PATH.'templates/'.$template_name) && ( $this->get_user_level() == LEVEL_ADMIN || preg_match('#^[^\.]#', $template_name) ) && file_exists(ROOT_PATH.'templates/'.$template_name.'/global.tpl.php') ) {
 					$this->available['templates'][] = $template_name;
-				
+				}
 			}
+
 			closedir($handle);
 			sort($this->available['templates']);
 			reset($this->available['templates']);
-			
 		}
-		
+
 		return $this->available['templates'];
-		
 	}
-	
+
 	/**
 	 * Get a list of language packs
 	 *
 	 * @return array List of available language packs
 	 */
-	function get_language_packs() {
-		
+	public function get_language_packs(): array {
 		if ( !count($this->available['languages']) ) {
-			
 			$handle = opendir(ROOT_PATH.'languages');
 			while ( false !== ( $language_name = readdir($handle) ) ) {
-				
-				if ( preg_match('#^lang_(.+)\.php$#', $language_name, $language_name) )
+				if ( preg_match('#^lang_(.+)\.php$#', $language_name, $language_name) ) {
 					$this->available['languages'][] = $language_name[1];
-				
+				}
 			}
+
 			closedir($handle);
 			sort($this->available['languages']);
 			reset($this->available['languages']);
-			
 		}
-		
+
 		return $this->available['languages'];
-		
 	}
-	
+
 	/**
 	 * Return the sql tables with the table prefix
 	 *
 	 * @return array List of SQL tables with UseBB table prefix
 	 */
-	function get_usebb_tables() {
-		
+	public function get_usebb_tables(): array {
 		global $db;
-		
+
 		if ( !count($this->db_tables) ) {
-			
 			$result = $db->query("SHOW TABLES LIKE '".TABLE_PREFIX."%'");
 			while ( $out = $db->fetch_result($result) )
 				$this->db_tables[] = current($out);
-			
 		}
-		
+
 		return $this->db_tables;
-		
 	}
 	
 	/**
@@ -2959,34 +2746,34 @@ class functions {
 	 * @param array $vars Array with GET variables
 	 * @param string $anchor HTML anchor
 	 */
-	function redirect($page, $vars=[], $anchor='') {
-		
+	public function redirect(string $page, array $vars=[], string $anchor=''): void {
 		$goto = $this->get_config('board_url').$this->make_url($page, $vars, false);
-		
-		if ( substr($goto, -2) == './' )
-			$goto = substr($goto, 0, strlen($goto)-2);
 
-		if ( !empty($anchor) )
+		if ( substr($goto, -2) == './' ) {
+			$goto = substr($goto, 0, strlen($goto)-2);
+		}
+
+		if ( !empty($anchor) ) {
 			$goto .= '#'.$anchor;
-		
+		}
+
 		$this->raw_redirect($goto);
-		
 	}
-	
+
 	/**
 	 * Redirect with a predefined URL
 	 *
 	 * @param string $url URL
 	 */
-	function raw_redirect($url) {
-		
+	public function raw_redirect(string $url): void {
 		//
 		// Don't use Location on IIS or Abyss
 		//
-		if ( strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') === false && strpos($_SERVER['SERVER_SOFTWARE'], 'Abyss') === false )
+		if ( strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') === false && strpos($_SERVER['SERVER_SOFTWARE'], 'Abyss') === false ) {
 			header('Location: '.$url);
+		}
+
 		die('<meta http-equiv="refresh" content="0;URL='.$url.'" />');
-		
 	}
 
 	/**
@@ -2996,49 +2783,41 @@ class functions {
 	 * @param bool $extended Extended checking (new passwords)
 	 * @return bool Valid
 	 */
-	function validate_password($password, $extended=false) {
-		
+	public function validate_password(string $password, bool $extended=false): bool {
 		$valid = ( preg_match(PWD_PREG, $password) );
-		
+
 		//
 		// Only do this for new passwords.
 		//
-		if ( $valid && $extended )
+		if ( $valid && $extended ) {
 			$valid = ( !contains_entities($password, true) && preg_match('#[[:alpha:]]#', $password) && preg_match('#[[:digit:]]#', $password) );
-		
+		}
+
 		return $valid;
-		
 	}
-	
+
 	/**
 	 * Validate an email address
 	 *
 	 * @param string $email_address Email address
 	 * @return bool Valid
 	 */
-	function validate_email($email_address) {
-		
-		if ( !preg_match(EMAIL_PREG, $email_address) )
+	public function validate_email(string $email_address): bool {
+		if ( !preg_match(EMAIL_PREG, $email_address) ) {
 			return false;
-		
-		if ( $this->get_config('enable_email_dns_check') ) {
-			
-			$parts = explode('@', $email_address);
-			
-			if ( function_exists('checkdnsrr') && !ON_WINDOWS ) {
-				
-				return checkdnsrr($parts[1], 'MX');
-				
-			} elseif ( ON_WINDOWS ) {
-				
-				return checkdnsrr_win($parts[1], 'MX');
-				
-			}
-			
 		}
-		
+
+		if ( $this->get_config('enable_email_dns_check') ) {
+			$parts = explode('@', $email_address);
+
+			if ( function_exists('checkdnsrr') && !ON_WINDOWS ) {
+				return checkdnsrr($parts[1], 'MX');
+			} elseif ( ON_WINDOWS ) {
+				return checkdnsrr_win($parts[1], 'MX');
+			}
+		}
+
 		return true;
-		
 	}
 	
 	/**
@@ -3058,19 +2837,18 @@ class functions {
 	 * @param string $value Value
 	 * @param int $expires Expire timestamp (when necessary)
 	 */
-	function setcookie($name, $value, $expires=null) {
-		
+	public function setcookie(string $name, string $value, ?int $expires=null): void {
 		$expires = ( is_null($expires) && empty($value) ) ? time()-31536000 : $expires;
 		$domain = $this->get_config('cookie_domain');
 		$secure = ( $this->get_config('cookie_secure') ) ? 1 : 0;
-		
-		if ( empty($domain) || !$this->get_config('cookie_httponly') )
+
+		if ( empty($domain) || !$this->get_config('cookie_httponly') ) {
 			setcookie($name, $value, $expires, $this->get_config('cookie_path'), $domain, $secure);
-		elseif ( version_compare(PHP_VERSION, '5.2.0RC2', '>=') )
+		} elseif ( version_compare(PHP_VERSION, '5.2.0RC2', '>=') ) {
 			setcookie($name, $value, $expires, $this->get_config('cookie_path'), $domain, $secure, true);
-		else
+		} else {
 			setcookie($name, $value, $expires, $this->get_config('cookie_path'), $domain.'; HttpOnly', $secure);
-		
+		}
 	}
 
 	/**
@@ -3078,56 +2856,50 @@ class functions {
 	 *
 	 * @param int $mode Anti-spam mode
 	 */
-	function generate_antispam_question($mode) {
-		
+	function generate_antispam_question(int $mode): void {
 		global $lang;
 
 		switch ( $mode ) {
-			
 			case ANTI_SPAM_MATH:
 				//
 				// Random math question
 				//
 				$operator = mt_rand(1, 2);
 				if ( $operator == 1 ) {
-					
 					$num1 = mt_rand(1, 9);
 					$num2 = mt_rand(1, 9);
 					$_SESSION['antispam_question_question'] = sprintf($lang['AntiSpamQuestionMathPlus'], $num1, $num2);
 					$_SESSION['antispam_question_answer'] = $num1 + $num2;
-
 				} else {
-					
 					$num1 = mt_rand(1, 9);
 					$num2 = mt_rand(1, $num1);
 					$_SESSION['antispam_question_question'] = sprintf($lang['AntiSpamQuestionMathMinus'], $num1, $num2);
 					$_SESSION['antispam_question_answer'] = $num1 - $num2;
-					
 				}
 				break;
-			
+
 			case ANTI_SPAM_CUSTOM:
 				//
 				// Custom admin-defined question
 				//
 				$questionPairs = $this->get_config('antispam_question_questions');
-				if ( !is_array($questionPairs) || !count($questionPairs) )
+				if ( !is_array($questionPairs) || !count($questionPairs) ) {
 					trigger_error('No custom anti-spam questions found.', E_USER_ERROR);
+				}
+
 				$questions = array_keys($questionPairs);
 				$answers = array_values($questionPairs);
 				unset($questionPairs);
-				
+
 				$questionId = ( count($questions) == 1 ) ? 0 : mt_rand(0, count($questions)-1);
-				
+
 				$_SESSION['antispam_question_question'] = $questions[$questionId];
 				$_SESSION['antispam_question_answer'] = $answers[$questionId];
 				break;
-			
+
 			default:
 				trigger_error('Spam check mode '.$mode.' does not exist.', E_USER_ERROR);
-			
 		}
-
 	}
 
 	/**
@@ -3135,23 +2907,23 @@ class functions {
 	 *
 	 * This might render a form and halt further page execution.
 	 */
-	function pose_antispam_question() {
-		
+	public function pose_antispam_question(): void {
 		global $session, $template, $lang, $db;
 
-		if ( !$session->sess_info['pose_antispam_question'] )
+		if ( !$session->sess_info['pose_antispam_question'] ) {
 			return;
-		
+		}
+
 		$template->clear_breadcrumbs();
 		$template->add_breadcrumb($lang['AntiSpamQuestion']);
-		
+
 		$mode = (int)$this->get_config('antispam_question_mode');
 
-		if ( empty($_SESSION['antispam_question_question']) )
+		if ( empty($_SESSION['antispam_question_question']) ) {
 			$this->generate_antispam_question($mode);
-	
+		}
+
 		if ( isset($_POST['answer']) && !is_array($_POST['answer']) && !strcasecmp(strval($_POST['answer']), strval($_SESSION['antispam_question_answer'])) ) {
-			
 			//
 			// Question passed, continuing...
 			//
@@ -3160,18 +2932,15 @@ class functions {
 			$this->redirect($_SERVER['PHP_SELF'], $_GET);
 
 			return;
-			
 		}
-		
+
 		if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
-			
 			$template->parse('msgbox', 'global', array(
 				'box_title' => $lang['Error'],
 				'content' => $lang['AntiSpamWrongAnswer']
 			));
-			
 		}
-		
+
 		$size = ( $mode === ANTI_SPAM_MATH ) ? 'size="2" maxlength="2"' : 'size="35"';
 		$template->parse('anti_spam_question', 'various', array(
 			'form_begin' => '<form action="'.$this->make_url($_SERVER['PHP_SELF'], $_GET).'" method="post">',
@@ -3181,14 +2950,12 @@ class functions {
 			'form_end' => '</form>'
 		));
 		$template->set_js_onload("set_focus('answer')");
-		
+
 		//
 		// Include the page footer
 		//
-		require(ROOT_PATH.'sources/page_foot.php');
-		
+		require ROOT_PATH.'sources/page_foot.php';
 		exit();
-		
 	}
 
 	/**
@@ -3198,8 +2965,7 @@ class functions {
 	 *
 	 * @return string Token
 	 */
-	function generate_token() {
-
+	public function generate_token(): string {
 		static $token;
 
 		if ( isset($token) )
@@ -3209,9 +2975,10 @@ class functions {
 		$time = (float)$usec + (float)$sec;
 		$key = $this->random_key();
 
-		if ( !$_SESSION['oldest_token'] )
+		if ( !$_SESSION['oldest_token'] ) {
 			$_SESSION['oldest_token'] = $time;
-		
+		}
+
 		// For some reason, PHP juggled between dot and comma as decimal separator
 		// when using strval() and others. (PHP 5.3.6 on OS X 10.6.7)
 		$stime = number_format($time, 4, '.', '');
@@ -3219,7 +2986,6 @@ class functions {
 		$token = $stime.'-'.$key;
 
 		return $token;
-
 	}
 
 	/**
@@ -3230,16 +2996,15 @@ class functions {
 	 * @param string $try_token Token to test
 	 * @return bool Verified
 	 */
-	function verify_token($try_token) {
-
-		if ( !preg_match('#^[0-9]+\.[0-9]{4}\-[0-9a-f]{32}$#', $try_token) )
+	public function verify_token(string $try_token): bool {
+		if ( !preg_match('#^[0-9]+\.[0-9]{4}\-[0-9a-f]{32}$#', $try_token) ) {
 			return false;
-		
+		}
+
 		list($time, $key) = explode('-', $try_token);
 		$sess_idx = $time;
 
 		return ( !empty($_SESSION['tokens'][$sess_idx]) && $_SESSION['tokens'][$sess_idx] === $key );
-
 	}
 
 	/**
@@ -3251,27 +3016,23 @@ class functions {
 	 *
 	 * @param string $type Error type ("form" or "url")
 	 */
-	function token_error($type) {
-		
+	public function token_error(string $type): void {
 		global $template, $lang;
 
 		$content = '';
 		switch ( $type ) {
-
 			case 'form':
 				$content = $lang['InvalidFormTokenNotice'];
 				break;
 			case 'url':
 				$content = $lang['InvalidURLTokenNotice'];
 				break;
-
 		}
-		
+
 		$template->parse('msgbox', 'global', array(
 			'box_title' => $lang['Note'],
 			'content' => nl2br($content)
 		));
-
 	}
 
 	/**
@@ -3282,13 +3043,14 @@ class functions {
 	 * @param bool $enable_message Enable error message
 	 * @return bool Verified
 	 */
-	function verify_form($enable_message=true) {
-
+	public function verify_form(bool $enable_message=true): bool {
 		$post_idx = '_form_token_';
+
 		$result = ( !empty($_POST[$post_idx]) && $this->verify_token($_POST[$post_idx]) );
 
-		if ( $enable_message && !$result )
+		if ( $enable_message && !$result ) {
 			$this->token_error('form');
+		}
 
 		return $result;
 
@@ -3302,13 +3064,14 @@ class functions {
 	 * @param bool $enable_message Enable error message
 	 * @return bool Verified
 	 */
-	function verify_url($enable_message=true) {
-
+	public function verify_url(bool $enable_message=true): bool {
 		$get_idx = '_url_token_';
+
 		$result = ( !empty($_GET[$get_idx]) && $this->verify_token($_GET[$get_idx]) );
 
-		if ( $enable_message && !$result )
+		if ( $enable_message && !$result ) {
 			$this->token_error('url');
+		}
 
 		return $result;
 
@@ -3320,10 +3083,8 @@ class functions {
 	 * @param string $url URL
 	 * @return string Contents
 	 */
-	function read_url($url) {
-		
+	public function read_url(string $url): string {
 		if ( function_exists('curl_init') && function_exists('curl_exec') ) {
-			
 			//
 			// cURL
 			//
@@ -3333,65 +3094,62 @@ class functions {
 			curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 3);
 			$result = curl_exec($curl);
 
-			if ( $result === FALSE )
+			if ( $result === FALSE ) {
 				return FALSE;
+			}
 
 			$contents = trim($result);
 			curl_close($curl);
 
 			return $contents;
-			
 		}
 
 		//
 		// URL fopen()
 		//
-		if ( !ini_get('allow_url_fopen') )
+		if ( !ini_get('allow_url_fopen') ) {
 			return false;
-		
+		}
+
 		$fp = fopen($url, 'r');
 
-		if ( !$fp )
+		if ( !$fp ) {
 			return false;
+		}
 
 		$contents = '';
 
 		if ( function_exists('stream_get_contents') ) {
-			
 			//
 			// PHP 5 stream
 			//
 			$result = stream_get_contents($fp);
 
-			if ( $result === FALSE )
+			if ( $result === FALSE ) {
 				return FALSE;
+			}
 
 			$contents = trim($result);
-			
 		} else {
-			
 			//
 			// fread() packet reading
 			//
 			while ( !feof($fp) ) {
-
 				$result = fread($fp, 8192);
 
-				if ( $result === FALSE )
+				if ( $result === FALSE ) {
 					return FALSE;
+				}
 
 				$contents .= $result;
-
 			}
 
 			$contents = trim($contents);
-			
 		}
 
 		fclose($fp);
 
 		return $contents;
-		
 	}
 
 	/**
@@ -3402,44 +3160,44 @@ class functions {
 	 * @param string $email Email address
 	 * @return mixed FALSE if nothing found, array otherwise
 	 */
-	function sfs_api_request(string $email): mixed {
-
+	public function sfs_api_request(string $email): mixed {
 		//
 		// Not really clean XML parsing code. Will improve for UseBB 2.
 		//
-		
+
 		//
 		// Session cache
 		//
-		if ( isset($_SESSION['sfs_ban_cache'][$email]) )
+		if ( isset($_SESSION['sfs_ban_cache'][$email]) ) {
 			return $_SESSION['sfs_ban_cache'][$email];
-		
+		}
+
 		$result = $this->read_url('http://www.stopforumspam.com/api?email='.urlencode($email));
 
 		//
 		// Failed request
 		//
-		if ( $result === FALSE || !preg_match('#<response[^>]+success="true"[^>]*>#', $result) )
+		if ( $result === FALSE || !preg_match('#<response[^>]+success="true"[^>]*>#', $result) ) {
 			return FALSE;
-		
+		}
+
 		//
 		// Not in database
 		//
 		if ( strpos($result, '<appears>yes</appears>') === FALSE ) {
-
 			$_SESSION['sfs_ban_cache'][$email] = FALSE;
-			
 			return FALSE;
-
 		}
-		
+
 		$return = [];
 
-		if ( preg_match('#<lastseen>([0-9]{4}\-[0-9]{2}\-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})</lastseen>#i', $result, $matches) )
+		if ( preg_match('#<lastseen>([0-9]{4}\-[0-9]{2}\-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})</lastseen>#i', $result, $matches) ) {
 			$return['lastseen'] = strtotime($matches[1]);
+		}
 
-		if ( preg_match('#<frequency>([0-9]+)</frequency>#i', $result, $matches) )
+		if ( preg_match('#<frequency>([0-9]+)</frequency>#i', $result, $matches) ) {
 			$return['frequency'] = (int) $matches[1];
+		}
 
 		$_SESSION['sfs_ban_cache'][$email] = $return;
 
@@ -3455,20 +3213,21 @@ class functions {
 	 * @param string $email Email address
 	 * @return bool Banned
 	 */
-	function sfs_email_banned(string $email): bool {
-
+	public function sfs_email_banned(string $email): bool {
 		global $db;
-		
-		if ( !$this->get_config('sfs_email_check') )
+
+		if ( !$this->get_config('sfs_email_check') ) {
 			return FALSE;
+		}
 
 		$info = $this->sfs_api_request($email);
 
 		//
 		// Not banned
 		//
-		if ( $info === FALSE )
+		if ( $info === FALSE ) {
 			return FALSE;
+		}
 
 		$min_frequency = $this->get_config('sfs_min_frequency');
 		$max_lastseen = $this->get_config('sfs_max_lastseen');
@@ -3477,12 +3236,14 @@ class functions {
 		// Does not meet requirements
 		//
 		if ( ( $min_frequency > 0 && ( !isset($info['frequency']) || $info['frequency'] < $min_frequency ) )
-			|| ( $max_lastseen > 0 && ( !isset($info['lastseen']) || $info['lastseen'] < time() - $max_lastseen * 86400 ) ) )
+			|| ( $max_lastseen > 0 && ( !isset($info['lastseen']) || $info['lastseen'] < time() - $max_lastseen * 86400 ) ) ) {
 			return FALSE;
+		}
 
-		if ( $this->get_config('sfs_save_bans') )
+		if ( $this->get_config('sfs_save_bans') ) {
 			$db->query("INSERT INTO ".TABLE_PREFIX."bans VALUES(NULL, '', '".$email."', '')");
-		
+		}
+
 		return TRUE;
 
 	}
@@ -3495,20 +3256,21 @@ class functions {
 	 * @param array $data Array with username, email and ip_addr.
 	 * @return bool Success
 	 */
-	function sfs_api_submit(array $data): bool {
-
+	public function sfs_api_submit(array $data): bool {
 		$key = $this->get_config('sfs_api_key');
 
-		if ( empty($data['username']) || empty($data['email']) || empty($data['ip_addr']) || empty($key) )
+		if ( empty($data['username']) || empty($data['email']) || empty($data['ip_addr']) || empty($key) ) {
 			return FALSE;
-		
+		}
+
 		$url = 'http://www.stopforumspam.com/add.php'
 			.'?username='.urlencode($data['username'])
 			.'&ip_addr='.urlencode($data['ip_addr'])
 			.'&email='.urlencode($data['email'])
 			.'&api_key='.urlencode($key);
+
 		$result = $this->read_url($url);
-		
+
 		return ( $result !== FALSE );
 
 	}
@@ -3523,64 +3285,71 @@ class functions {
 	 * @param bool $activate Whether this is when activating a user.
 	 * @return int Active value
 	 */
-	function user_active_value(?array $user=NULL, bool $new_post=FALSE, bool $activate=FALSE): int {
-		
+	public function user_active_value(?array $user=NULL, bool $new_post=FALSE, bool $activate=FALSE): int {
 		//
 		// Potential spammer status not enabled
 		//
-		if ( !$this->get_config('antispam_disable_post_links') 
-			&& !$this->get_config('antispam_disable_profile_links') )
+		if ( !$this->get_config('antispam_disable_post_links') && !$this->get_config('antispam_disable_profile_links') ) {
 			return USER_ACTIVE;
-		
+		}
+
 		//
 		// New (no) user = potential spammer
 		//
-		if ( $user === NULL )
+		if ( $user === NULL ) {
 			return USER_POTENTIAL_SPAMMER;
+		}
 
 		//
 		// poster_level is sometimes used
 		//
-		if ( !isset($user['level']) && isset($user['poster_level']) )
+		if ( !isset($user['level']) && isset($user['poster_level']) ) {
 			$user['level'] = $user['poster_level'];
+		}
 
-		if ( !isset($user['level']) )
+		if ( !isset($user['level']) ) {
 			trigger_error('Missing data for calculating active value.', E_USER_ERROR);
+		}
 
 		//
 		// Guests are potential spammers (when enabled)
 		//
-		if ( $user['level'] == LEVEL_GUEST && $this->get_config('antispam_status_for_guests') )
+		if ( $user['level'] == LEVEL_GUEST && $this->get_config('antispam_status_for_guests') ) {
 			return USER_POTENTIAL_SPAMMER;
+		}
 
 		//
 		// Only for regular members
 		//
-		if ( $user['level'] != LEVEL_MEMBER )
+		if ( $user['level'] != LEVEL_MEMBER ) {
 			return USER_ACTIVE;
+		}
 
-		if ( !isset($user['active']) )
+		if ( !isset($user['active']) ) {
 			trigger_error('Missing data for calculating active value.', E_USER_ERROR);
+		}
 
 		//
 		// Keep status for no new post or active user, unless is activating
 		//
-		if ( !$activate && ( !$new_post || $user['active'] == USER_ACTIVE ) )
+		if ( !$activate && ( !$new_post || $user['active'] == USER_ACTIVE ) ) {
 			return $user['active'];
-		
-		if ( !isset($user['posts']) )
+		}
+
+		if ( !isset($user['posts']) ) {
 			trigger_error('Missing data for calculating active value.', E_USER_ERROR);
+		}
 
 		$max_posts = (int) $this->get_config('antispam_status_max_posts');
-		if ( $new_post )
+		if ( $new_post ) {
 			$user['posts'] += 1;
+		}
 
 		//
 		// When max posts is set and user has more posts,
 		// user gets active status, otherwise still potential spammer.
 		//
-		return ( $max_posts > 0 && $user['posts'] > $max_posts ) 
-			? USER_ACTIVE : USER_POTENTIAL_SPAMMER;
+		return ( $max_posts > 0 && $user['posts'] > $max_posts ) ? USER_ACTIVE : USER_POTENTIAL_SPAMMER;
 
 	}
 
@@ -3591,23 +3360,23 @@ class functions {
 	 * @param bool $new_post Whether this is for a request increasing the post count.
 	 * @return bool Is potential spammer
 	 */
-	function antispam_is_potential_spammer(array $user, bool $new_post=FALSE): bool {
-		
+	public function antispam_is_potential_spammer(array $user, bool $new_post=FALSE): bool {
 		//
 		// poster_level is sometimes used
 		//
-		if ( !isset($user['level']) && isset($user['poster_level']) )
+		if ( !isset($user['level']) && isset($user['poster_level']) ) {
 			$user['level'] = $user['poster_level'];
-		
+		}
+
 		//
 		// Inactive members are potential spammers whenever the status is enabled
 		//
 		if ( ($this->get_config('antispam_disable_post_links') || $this->get_config('antispam_disable_profile_links')) 
-			&& $user['level'] == LEVEL_MEMBER && $user['active'] == USER_INACTIVE )
+			&& $user['level'] == LEVEL_MEMBER && $user['active'] == USER_INACTIVE ) {
 			return TRUE;
-		
-		return ( $this->user_active_value($user, $new_post) == USER_POTENTIAL_SPAMMER );
+		}
 
+		return ( $this->user_active_value($user, $new_post) == USER_POTENTIAL_SPAMMER );
 	}
 
 	/**
@@ -3617,11 +3386,9 @@ class functions {
 	 * @param bool $new_post Whether this is for a request increasing the post count.
 	 * @return bool Whether can post links
 	 */
-	function antispam_can_post_links(array $user, bool $new_post=FALSE): bool {
-
+	public function antispam_can_post_links(array $user, bool $new_post=FALSE): bool {
 		return ( !$this->antispam_is_potential_spammer($user, $new_post) 
 			|| !$this->get_config('antispam_disable_post_links') );
-
 	}
 
 	/**
@@ -3630,13 +3397,8 @@ class functions {
 	 * @param array $user User array with active, level and posts.
 	 * @return bool Whether can add profile links
 	 */
-	function antispam_can_add_profile_links(array $user): bool {
-
+	public function antispam_can_add_profile_links(array $user): bool {
 		return ( !$this->antispam_is_potential_spammer($user, FALSE) 
 			|| !$this->get_config('antispam_disable_profile_links') );
-
 	}
-
 }
-
-?>

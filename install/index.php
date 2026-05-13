@@ -39,11 +39,11 @@ define('IS_INSTALLER', true);
 //
 // Include usebb engine
 //
-require(ROOT_PATH.'sources/common.php');
+require ROOT_PATH.'sources/common.php';
 
 $lang = $functions->fetch_language('English');
 
-require(ROOT_PATH.'sources/functions_admin.php');
+require ROOT_PATH.'sources/functions_admin.php';
 
 $admin_functions = new admin_functions;
 
@@ -201,58 +201,47 @@ if ( empty($_SESSION['installer_running']) && $functions->get_config('installer_
 		</table>
 		
 		'.$submit.'
-		<p>If you encounter a <em>General Error</em>, the configuration values may be wrong. Check them and restart the installation.</p>
-';
-		
+		<p>If you encounter a <em>General Error</em>, the configuration values may be wrong. Check them and restart the installation.</p>';
 	}
-	
 } elseif ( $_GET['step'] === 2 && !empty($_SESSION['admin_username']) && preg_match(USER_PREG, $_SESSION['admin_username']) && !empty($_SESSION['admin_email']) && preg_match(EMAIL_PREG, $_SESSION['admin_email']) && !empty($_SESSION['admin_passwd']) ) {
-	
 	$lines_schema = file('./schemas/mysql.sql');
 	$lines_data = file('./usebb.sql');
 	$lines = array_merge($lines_schema, $lines_data);
-	$queries = array();
+	$queries = [];
 	$i = 0;
-	
+
 	foreach ($lines as $sql) {
 		
 		$sql = trim($sql);
 		if ( !empty($sql) && !preg_match('#^[-\#]#', $sql) ) {
-			
-			if ( !array_key_exists($i, $queries) )
+			if ( !array_key_exists($i, $queries) ) {
 				$queries[$i] = '';
-			
+			}
+
 			$queries[$i] .= $sql.' ';
-			
+
 			if ( preg_match('#;$#', $sql) ) {
-				
 				$query = trim(str_replace('usebb_', TABLE_PREFIX, preg_replace("#\s#", ' ', $queries[$i])));
 				$queries[$i] = substr($query, 0, strlen($query)-1);
 				$i++;
-				
 			}
-			
 		}
-		
 	}
-	
+
 	$queries[] = "INSERT INTO ".TABLE_PREFIX."members ( id, name, displayed_name, email, passwd, regdate, level, active, template, language, date_format, enable_quickreply, return_to_topic_after_posting, target_blank, hide_avatars, hide_userinfo, hide_signatures, banned_reason, signature ) VALUES ( NULL, '".$_SESSION['admin_username']."', '".$_SESSION['admin_username']."', '".$_SESSION['admin_email']."', '".$_SESSION['admin_passwd']."', ".time().", 3, 1, '".$functions->get_config('template')."', '".$functions->get_config('language')."', '".$functions->get_config('date_format')."', ".$functions->get_config('enable_quickreply').", ".$functions->get_config('return_to_topic_after_posting').", ".$functions->get_config('target_blank').", ".$functions->get_config('hide_avatars').", ".$functions->get_config('hide_userinfo').", ".$functions->get_config('hide_signatures').", '', '' )";
-	
-	foreach ( $queries as $query )
+
+	foreach ( $queries as $query ) {
 		$db->query($query);
+	}
 
 	$functions->set_stats('members', 1, true);
-	
+
 	unset($_SESSION['installer_running'], $_SESSION['admin_username'], $_SESSION['admin_email'], $_SESSION['admin_passwd']);
-	
+
 	$out .= '		<p>The installation is complete. You must now <strong>remove the <code>install</code> directory</strong> from your forum\'s files. After this, you can log in into <a href="../">your UseBB forum</a>.</p>
-		<p>If you need any help, feel free to visit the <a href="http://www.usebb.net/community/">community forums</a> at UseBB.net. Thanks for choosing UseBB!</p>
-';
-	
+		<p>If you need any help, feel free to visit the <a href="http://www.usebb.net/community/">community forums</a> at UseBB.net. Thanks for choosing UseBB!</p>';
 } else {
-	
 	$functions->redirect('index.php');
-	
 }
 
 $out .= '		</form>

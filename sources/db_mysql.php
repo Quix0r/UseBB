@@ -62,42 +62,38 @@ ini_set('mysql.trace_mode', '0');
  * @subpackage Core
  */
 class db {
-	
-	/**#@+
-	 * @access private
-	 */
-	var $connection;
-	var $queries = array();
-	var $persistent;
-	/**#@-*/
-	
+	private $connection;
+	private $queries = [];
+	private $persistent;
+
 	/**
 	 * Make a connection to the MySQL server
 	 *
 	 * @param array $config Database configuration
 	 */
-	function connect($config) {
+	public function connect(array $config): void {
 		
-		if ( defined('NO_DB') )
+		if ( defined('NO_DB') ) {
 			return;
-		
+		}
+
 		$this->persistent = (bool) $config['persistent'];
 
 		//
 		// Connect to server
 		//
-		if ( $this->persistent )
-			$this->connection = @mysql_pconnect($config['server'], $config['username'], $config['passwd']) or trigger_error('SQL: '.mysql_error(), E_USER_ERROR);
-		else
-			$this->connection = @mysql_connect($config['server'], $config['username'], $config['passwd'], true) or trigger_error('SQL: '.mysql_error(), E_USER_ERROR);
-		
+		if ( $this->persistent ) {
+			$this->connection = mysql_pconnect($config['server'], $config['username'], $config['passwd']) or trigger_error('SQL: '.mysql_error(), E_USER_ERROR);
+		} else {
+			$this->connection = mysql_connect($config['server'], $config['username'], $config['passwd'], true) or trigger_error('SQL: '.mysql_error(), E_USER_ERROR);
+		}
+
 		//
 		// Select database
 		//
-		@mysql_select_db($config['dbname'], $this->connection) or trigger_error('SQL: '.mysql_error($this->connection), E_USER_ERROR);
-		
+		mysql_select_db($config['dbname'], $this->connection) or trigger_error('SQL: '.mysql_error($this->connection), E_USER_ERROR);
 	}
-	
+
 	/**
 	 * Execute database queries
 	 *

@@ -62,13 +62,10 @@ ini_set('mysql.trace_mode', '0');
  * @subpackage Core
  */
 class db {
-	
-	/**#@+
-	 * @access private
-	 */
-	var $connection;
-	var $queries = array();
-	var $persistent;
+	private $connection;
+	private $queries = [];
+	private $persistent;
+
 	/**#@-*/
 	
 	/**
@@ -76,36 +73,37 @@ class db {
 	 *
 	 * @param array $config Database configuration
 	 */
-	function connect($config) {
-		
+	function connect(array $config): void {
 		global $functions;
-		
-		if ( defined('NO_DB') )
+
+		if ( defined('NO_DB') {
 			return;
-		
+		}
+
 		//
 		// mysqli persistent only for 5.3.0+
 		//
 		$this->persistent = ( $config['persistent'] && version_compare(PHP_VERSION, '5.3.0', '>=') );
-		if ( $this->persistent )
+		if ( $this->persistent ) {
 			$config['server'] = 'p:'.$config['server'];
+		}
 
 		//
 		// Connect to server
 		//
-		$this->connection = @mysqli_connect($config['server'], $config['username'], $config['passwd']) or trigger_error('SQL: '.mysqli_connect_error(), E_USER_ERROR);
-		
+		$this->connection = mysqli_connect($config['server'], $config['username'], $config['passwd']) or trigger_error('SQL: '.mysqli_connect_error(), E_USER_ERROR);
+
 		//
 		// Select database
 		//
-		@mysqli_select_db($this->connection, $config['dbname']) or trigger_error('SQL: '.mysqli_error($this->connection), E_USER_ERROR);
-		
+		mysqli_select_db($this->connection, $config['dbname']) or trigger_error('SQL: '.mysqli_error($this->connection), E_USER_ERROR);
+
 		//
 		// Set transaction to latin1
 		//
-		if ( is_object($functions) && $functions->get_config('force_latin1_db', true) )
+		if ( is_object($functions) && $functions->get_config('force_latin1_db', true) ) {
 			$this->query("SET NAMES latin1", true, false);
-		
+		}
 	}
 	
 	/**
@@ -115,22 +113,21 @@ class db {
 	 * @param bool $return_error Return error instead of giving general error
 	 * @return mixed SQL result resource or SQL error (only when $return_error is true)
 	 */
-	function query($query, $return_error=false, $log=true) {
-		
-		if ( $log )
+	function query(string $query, bool $return_error=false, bool $log=true) {
+		if ( $log ) {
 			$this->queries[] = preg_replace('#\s+#', ' ', $query);
-		
-		$result = @mysqli_query($this->connection, $query) or $error = mysqli_error($this->connection);
-		
-		if ( isset($error) ) {
-			
-			if ( $return_error ) 
-				return $error;
-			else
-				trigger_error('SQL: '.$error, E_USER_ERROR);
-			
 		}
-		
+
+		$result = mysqli_query($this->connection, $query) or $error = mysqli_error($this->connection);
+
+		if ( isset($error) ) {
+			if ( $return_error ) {
+				return $error;
+			} else {
+				trigger_error('SQL: '.$error, E_USER_ERROR);
+			}
+		}
+
 		return $result;
 		
 	}
@@ -141,19 +138,15 @@ class db {
 	 * @param resource $result SQL query resource
 	 * @return array Array containing one result
 	 */
-	function fetch_result(&$result) {
-		
+	function fetch_result(&$result): array {
 		$res_array = mysqli_fetch_array($result, MYSQLI_ASSOC);
 
 		if ( is_array($res_array) ) {
-			
 			array_walk($res_array, 'usebb_clean_db_value');
 			reset($res_array);
-			
 		}
 
 		return $res_array;
-		
 	}
 	
 	/**
@@ -162,10 +155,8 @@ class db {
 	 * @param resource $result SQL query resource
 	 * @return int Number of result rows
 	 */
-	function num_rows(&$result) {
-		
+	function num_rows(&$result): int {
 		return mysqli_num_rows($result);
-		
 	}
 	
 	/**
@@ -195,25 +186,19 @@ class db {
 	 *
 	 * @return array Array containing database driver info and server version
 	 */
-	function get_server_info() {
-		
-		return array(
+	function get_server_info(): array {
+		return [
 			'MySQL (mysqli)',
 			mysqli_get_server_info($this->connection)
-		);
-		
+		];
 	}
 	
 	/**
 	 * Disconnect the database connection
 	 */
 	function disconnect() {
-		
-		if ( !$this->persistent )
-			@mysqli_close($this->connection);
-		
+		if ( !$this->persistent ) {
+			mysqli_close($this->connection);
+		}
 	}
-	
 }
-
-?>

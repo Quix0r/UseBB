@@ -42,14 +42,14 @@ define('ROOT_PATH', dirname(__FILE__) . '/');
 //
 // Include usebb engine
 //
-require(ROOT_PATH.'sources/common.php');
+require ROOT_PATH.'sources/common.php';
 
 $session->update('activetopics');
 
 //
 // Include the page header
 //
-require(ROOT_PATH.'sources/page_head.php');
+require ROOT_PATH.'sources/page_head.php';
 
 if ( $functions->get_user_level() < $functions->get_config('view_active_topics_min_level') ) {
 	
@@ -65,33 +65,27 @@ if ( $functions->get_user_level() < $functions->get_config('view_active_topics_m
 		'box_title' => $lang['Note'],
 		'content' => $lang['NoActivetopics']
 	));
-	
 } else {
-	
 	$exclude_forums = $functions->get_config('exclude_forums_active_topics');
 	$exclude_forums_query_part = ( is_array($exclude_forums) && count($exclude_forums) ) ? " AND id NOT IN (".join(', ', $exclude_forums).")" : '';
-	
+
 	//
 	// Get a list of forums
 	//
 	$result = $db->query("SELECT id, name, auth FROM ".TABLE_PREFIX."forums WHERE topics > 0".$exclude_forums_query_part);
-	
-	$forum_ids = $forum_names = array();
+
+	$forum_ids = $forum_names = [];
 	while ( $forumdata = $db->fetch_result($result) ) {
-		
 		//
 		// Place permitted forums into the arrays
 		//
 		if ( $functions->auth($forumdata['auth'], 'read', $forumdata['id']) ) {
-			
 			$forum_ids[] = $forumdata['id'];
 			$forum_names[$forumdata['id']] = $forumdata['name'];
-			
 		}
-		
 	}
+
 	if ( !count($forum_ids) ) {
-		
 		//
 		// No active topics
 		//
@@ -100,48 +94,42 @@ if ( $functions->get_user_level() < $functions->get_config('view_active_topics_m
 			'box_title' => $lang['Note'],
 			'content' => $lang['NoActivetopics']
 		));
-		
 	} else {
-		
 		//
 		// Parse the active topics list
 		//
-		
 		$max_age = intval($functions->get_config('active_topics_max_age'));
 		$max_age_query_part = ( $max_age > 0 ) ? " AND p2.post_time > ".(time() - $max_age * 86400) : "";
 
 		$query = "SELECT t.id, t.forum_id, t.topic_title, t.last_post_id, t.count_replies, t.count_views, t.status_locked, t.status_sticky, p.poster_guest, p2.poster_guest AS last_poster_guest, p2.post_time AS last_post_time, u.id AS poster_id, u.displayed_name AS poster_name, u.level AS poster_level, u2.id AS last_poster_id, u2.displayed_name AS last_poster_name, u2.level AS last_poster_level FROM ".TABLE_PREFIX."topics t, ".TABLE_PREFIX."posts p LEFT JOIN ".TABLE_PREFIX."members u ON p.poster_id = u.id, ".TABLE_PREFIX."posts p2 LEFT JOIN ".TABLE_PREFIX."members u2 ON p2.poster_id = u2.id WHERE t.forum_id IN(".join(', ', $forum_ids).") AND p.id = t.first_post_id AND p2.id = t.last_post_id".$max_age_query_part." ORDER BY p2.post_time DESC LIMIT ".$functions->get_config('active_topics_count');
-		
+
 		$active_topics_found = false;
 		$result = $db->query($query);
-		
+
 		while ( $topicdata = $db->fetch_result($result) ) {
-			
 			if ( !$active_topics_found ) {
-				
 				$template->add_breadcrumb($lang['ActiveTopics']);
 				$template->parse('header', 'activetopics');
 
 				$active_topics_found = true;
-				
 			}
 
 			//
 			// Loop through the topics, generating output...
 			//
 			$topic_name = '<a href="'.$functions->make_url('topic.php', array('id' => $topicdata['id'])).'">'.unhtml($functions->replace_badwords(stripslashes($topicdata['topic_title']))).'</a>';
-			if ( $topicdata['status_sticky'] )
+			if ( $topicdata['status_sticky'] ) {
 				$topic_name = $lang['Sticky'].': '.$topic_name;
-			$last_post_author = ( $topicdata['last_poster_id'] > LEVEL_GUEST ) ? $functions->make_profile_link($topicdata['last_poster_id'], $topicdata['last_poster_name'], $topicdata['last_poster_level']) : $topicdata['last_poster_guest'];
-			
-			list($topic_icon, $topic_status) = $functions->topic_icon($topicdata['id'], $topicdata['status_locked'], $topicdata['last_post_time']);
-			
-			if ( $topic_status == $lang['NewPosts'] || $topic_status == $lang['LockedNewPosts'] ) {
-				
-				$topic_name = sprintf($template->get_config('newpost_link_format'), $functions->make_url('topic.php', array('id' => $topicdata['id'], 'act' => 'getnewpost')).'#newpost', 'templates/'.$functions->get_config('template').'/gfx/'.$template->get_config('newpost_link_icon'), $topic_status) . $topic_name;
-				
 			}
-			
+
+			$last_post_author = ( $topicdata['last_poster_id'] > LEVEL_GUEST ) ? $functions->make_profile_link($topicdata['last_poster_id'], $topicdata['last_poster_name'], $topicdata['last_poster_level']) : $topicdata['last_poster_guest'];
+
+			list($topic_icon, $topic_status) = $functions->topic_icon($topicdata['id'], $topicdata['status_locked'], $topicdata['last_post_time']);
+
+			if ( $topic_status == $lang['NewPosts'] || $topic_status == $lang['LockedNewPosts'] ) {
+				$topic_name = sprintf($template->get_config('newpost_link_format'), $functions->make_url('topic.php', array('id' => $topicdata['id'], 'act' => 'getnewpost')).'#newpost', 'templates/'.$functions->get_config('template').'/gfx/'.$template->get_config('newpost_link_icon'), $topic_status) . $topic_name;
+			}
+
 			//
 			// Parse the topic template
 			//
@@ -161,15 +149,11 @@ if ( $functions->get_user_level() < $functions->get_config('view_active_topics_m
 				'lp_date' => $functions->make_date($topicdata['last_post_time']),
 				'last_post_url' => $functions->make_url('topic.php', array('post' => $topicdata['last_post_id'])).'#post'.$topicdata['last_post_id']
 			));
-			
 		}
-		
-		if ( $active_topics_found ) {
-			
-			$template->parse('footer', 'activetopics');
 
+		if ( $active_topics_found ) {
+			$template->parse('footer', 'activetopics');
 		} else {
-			
 			//
 			// No active topics
 			//
@@ -178,14 +162,11 @@ if ( $functions->get_user_level() < $functions->get_config('view_active_topics_m
 				'box_title' => $lang['Note'],
 				'content' => $lang['NoActivetopics']
 			));
-			
 		}
-		
 	}
-	
 }
-	
+
 //
 // Include the page footer
 //
-require(ROOT_PATH.'sources/page_foot.php');
+require ROOT_PATH.'sources/page_foot.php';

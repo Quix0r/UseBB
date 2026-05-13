@@ -32,7 +32,7 @@ if ( !defined('INCLUDED') )
 //
 // Initialize a new translations holder array
 //
-$lang = array();
+$lang = [];
 
 //
 // Translation settings
