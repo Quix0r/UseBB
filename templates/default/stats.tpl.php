@@ -156,5 +156,3 @@ $templates['most_viewed_topics_footer'] = '
 		</tr>
 	</table>
 ';
-
-?>

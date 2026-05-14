@@ -249,5 +249,3 @@ $templates['editpwd_form'] = '
 	</table>
 	{form_end}
 ';
-
-?>

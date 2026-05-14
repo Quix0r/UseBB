@@ -50,7 +50,7 @@ $session->update('reply:'.$_GET['topic']);
 //
 // Include the page header
 //
-require(ROOT_PATH.'sources/page_head.php');
+require ROOT_PATH.'sources/page_head.php';
 
 $result = $db->query("SELECT t.id, t.topic_title, t.status_locked, t.forum_id, t.count_replies, f.id AS forum_id, f.name AS forum_name, f.status AS forum_status, f.auth, f.auto_lock, f.increase_post_count FROM ".TABLE_PREFIX."topics t, ".TABLE_PREFIX."forums f WHERE t.id = ".$_GET['topic']." AND f.id = t.forum_id");
 $topicdata = $db->fetch_result($result);
@@ -366,6 +366,4 @@ if ( !$topicdata['id'] ) {
 //
 // Include the page footer
 //
-require(ROOT_PATH.'sources/page_foot.php');
-
-?>
+require ROOT_PATH.'sources/page_foot.php';

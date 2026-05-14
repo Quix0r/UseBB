@@ -95,5 +95,3 @@ $templates['quick_reply'] = '
 	</table>
 	{form_end}
 ';
-
-?>

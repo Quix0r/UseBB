@@ -71,5 +71,3 @@ $templates['question'] = '
 		</tr>
 	</table>
 ';
-
-?>

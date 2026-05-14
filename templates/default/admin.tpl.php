@@ -65,5 +65,3 @@ $templates['main'] = '
 	
 	<div id="adminbottomfix"></div>
 ';
-
-?>

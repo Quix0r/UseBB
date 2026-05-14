@@ -156,26 +156,28 @@ if ( !empty($ga_account) ) {
 	);
 
 	switch ( $functions->get_config('ga_mode') ) {
+		case GA_SINGLE_DOMAIN:
+			break;
 
-	case GA_SINGLE_DOMAIN:
-		break;
-	case GA_MULTIPLE_SUBDOMAINS:
-		$code_opts['setDomainName'] = $functions->get_config('ga_domain');
-		$code_opts['setAllowHash'] = 'false';
-		break;
-	case GA_MULTIPLE_DOMAINS:
-		$code_opts['setDomainName'] = $functions->get_config('ga_domain');
-		$code_opts['setAllowHash'] = 'false';
-		$code_opts['setAllowLinker'] = 'true';
-		break;
-	default:
-		trigger_error('Unknown Google Analytics mode.', E_USER_ERROR);
+		case GA_MULTIPLE_SUBDOMAINS:
+			$code_opts['setDomainName'] = $functions->get_config('ga_domain');
+			$code_opts['setAllowHash'] = 'false';
+			break;
 
+		case GA_MULTIPLE_DOMAINS:
+			$code_opts['setDomainName'] = $functions->get_config('ga_domain');
+			$code_opts['setAllowHash'] = 'false';
+			$code_opts['setAllowLinker'] = 'true';
+			break;
+
+		default:
+			trigger_error('Unknown Google Analytics mode.');
 	}
 
 	$code_opt = '';
-	foreach ( $code_opts as $k => $v )
+	foreach ( $code_opts as $k => $v ) {
 		$code_opt .= "_gaq.push(['_{$k}', '{$v}']);\n";
+	}
 
 	$ga_code = "<script type=\"text/javascript\">
 

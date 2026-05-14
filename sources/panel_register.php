@@ -51,7 +51,7 @@ $session->update('register');
 //
 // Include the page header
 //
-require(ROOT_PATH.'sources/page_head.php');
+require ROOT_PATH.'sources/page_head.php';
 
 $template->add_breadcrumb($lang['Register']);
 
@@ -437,6 +437,4 @@ if ( $functions->get_config('disable_registrations') ) {
 //
 // Include the page footer
 //
-require(ROOT_PATH.'sources/page_foot.php');
-
-?>
+require ROOT_PATH.'sources/page_foot.php';

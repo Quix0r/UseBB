@@ -733,31 +733,26 @@ if (
 	// Implement sections
 	//
 	foreach ( $sections as $section_name => $parts ) {
-		
 		$content .= '<div class="adminconfigtablecell" id="'.$section_name.'"><table class="adminconfigtable">';
 		$content .= '<tr><th colspan="2">'.$lang['ConfigBoardSection-'.$section_name].'</th></tr>';
-		
-		if ( !empty($lang['ConfigBoardSection-'.$section_name.'-info']) )
+
+		if ( !empty($lang['ConfigBoardSection-'.$section_name.'-info']) ) {
 			$content .= '<tr><td colspan="2">'.$lang['ConfigBoardSection-'.$section_name.'-info'].'</td></tr>';
-		
+		}
+
 		foreach ( $parts as $part ) {
-			
 			$content .= $input[$part];
 			unset($input[$part]);
-			
 		}
-		
+
 		$content .= '</table></div>';
-		
 	}
-	
-	if ( !is_writable(ROOT_PATH.'config.php') )
+
+	if ( !is_writable(ROOT_PATH.'config.php') ) {
 		$content .= '<p>'.sprintf($lang['IndexUnwritableConfig'], '<code>config.php</code>').'</p>';
-	
+	}
+
 	$content .= '<p class="submit" id="adminconfigsubmit"><input type="submit" value="'.$lang['Save'].'" />'.$admin_functions->form_token().' <input type="reset" value="'.$lang['Reset'].'" /></p></form>';
-	
 }
 
 $admin_functions->create_body('config', $content);
-
-?>

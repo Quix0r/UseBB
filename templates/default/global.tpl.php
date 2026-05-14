@@ -165,5 +165,3 @@ $templates['confirm_form'] = '
 	</table>
 	{form_end}
 ';
-
-?>

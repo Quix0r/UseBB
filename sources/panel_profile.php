@@ -284,50 +284,42 @@ if ( !empty($_POST['displayed_name']) && entities_strlen($_POST['displayed_name'
 			$errors[] = $lang['Website'];
 		
 		if ( count($errors) ) {
-			
 			$template->parse('msgbox', 'global', array(
 				'box_title' => $lang['Error'],
 				'content' => sprintf($lang['MissingFields'], join(', ', $errors))
 			));
-			
 		}
-		
+
 		if ( !empty($_POST['displayed_name']) && entities_strlen($_POST['displayed_name']) < $functions->get_config('username_min_length') ) {
-			
 			$template->parse('msgbox', 'global', array(
 				'box_title' => $lang['Error'],
 				'content' => sprintf($lang['StringTooShort'], $lang['DisplayedName'], $functions->get_config('username_min_length'))
 			));
-			
 		}
-		
+
 		if ( !empty($_POST['displayed_name']) && entities_strlen($_POST['displayed_name']) > $functions->get_config('username_max_length') ) {
-			
 			$template->parse('msgbox', 'global', array(
 				'box_title' => $lang['Error'],
 				'content' => sprintf($lang['StringTooLong'], $lang['DisplayedName'], $functions->get_config('username_max_length'))
 			));
-			
 		}
-		
+
 		if ( !empty($_POST['signature']) && entities_strlen($_POST['signature']) > $functions->get_config('sig_max_length') ) {
-			
 			$template->parse('msgbox', 'global', array(
 				'box_title' => $lang['Error'],
 				'content' => sprintf($lang['StringTooLong'], $lang['Signature'], $functions->get_config('sig_max_length'))
 			));
-			
 		}
-		
 	}
-	
+
 	//
 	// Keep submitted info in the form, even when erroneous
 	//
 	$user_info = array();
-	foreach ( $session->sess_info['user_info'] as $key => $val )
+	foreach ( $session->sess_info['user_info'] as $key => $val ) {
 		$user_info[$key] = ( isset($_POST[$key]) ) ? $_POST[$key] : $val;
-	
+	}
+
 	list($birthday_year_input, $birthday_month_input, $birthday_day_input) = $functions->birthday_input_fields($session->sess_info['user_info']['birthday']);
 	
 	$textarea_rows = max(floor($template->get_config('textarea_rows') / 3), 3);
@@ -370,5 +362,3 @@ if ( !empty($_POST['displayed_name']) && entities_strlen($_POST['displayed_name'
 	), false, true);
 	
 }
-
-?>

@@ -160,18 +160,12 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['unsubscribe']) && is_
 					'last_post_url' => $functions->make_url('topic.php', array('post' => $topicdata['last_post_id'])).'#post'.$topicdata['last_post_id'],
 					'unsubscribe_check' => '<input type="checkbox" name="unsubscribe[]" value="'.$topicdata['id'].'" />',
 				));
-				
 			}
-			
+
 			$template->parse('subscriptions_footer', 'panel', array(
 				'unsubscribe_submit' => $unsubscribe_submit,
 				'form_end' => '</form>'
 			), false, true);
-			
 		}
-		
 	}
-	
 }
-
-?>

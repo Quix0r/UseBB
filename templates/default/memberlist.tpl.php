@@ -66,5 +66,3 @@ $templates['footer'] = '
 	</table>
 	<p id="pagelinksotherbottom">{page_links}</p>
 ';
-
-?>

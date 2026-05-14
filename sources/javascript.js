@@ -47,11 +47,12 @@ if (clientPC.indexOf('opera')!=-1) {
 function insert_tags(tagOpen, tagClose) {
 	var txtarea = document.getElementById('tags-txtarea');
 	var sampleText = '';
+
 	// IE
-	if(document.selection	&& !is_gecko) {
+	if (document.selection	&& !is_gecko) {
 		var theSelection = document.selection.createRange().text;
 		var replaced = true;
-		if(!theSelection){
+		if (!theSelection) {
 			replaced = false;
 			theSelection=sampleText;
 		}
@@ -59,7 +60,8 @@ function insert_tags(tagOpen, tagClose) {
  
 		// This has change
 		text = theSelection;
-		if(theSelection.charAt(theSelection.length - 1) == " "){// exclude ending space char, if any
+		if (theSelection.charAt(theSelection.length - 1) == " ") {
+			// exclude ending space char, if any
 			theSelection = theSelection.substring(0, theSelection.length - 1);
 			r = document.selection.createRange();
 			r.text = tagOpen + theSelection + tagClose + " ";
@@ -67,21 +69,22 @@ function insert_tags(tagOpen, tagClose) {
 			r = document.selection.createRange();
 			r.text = tagOpen + theSelection + tagClose;
 		}
-		if(!replaced){
+		if (!replaced) {
 			r.moveStart('character',-text.length-tagClose.length);
 			r.moveEnd('character',-tagClose.length);
 		}
 		r.select();
 	// Mozilla
-	} else if(txtarea.selectionStart || txtarea.selectionStart == '0') {
+	} else if (txtarea.selectionStart || txtarea.selectionStart == '0') {
 		var replaced = false;
 		var startPos = txtarea.selectionStart;
 		var endPos	 = txtarea.selectionEnd;
-		if(endPos - startPos) replaced = true;
+		if (endPos - startPos) { replaced = true; }
 		var scrollTop=txtarea.scrollTop;
 		var myText = (txtarea.value).substring(startPos, endPos);
-		if(!myText) { myText=sampleText;}
-		if(myText.charAt(myText.length - 1) == " "){ // exclude ending space char, if any
+		if (!myText) { myText=sampleText;}
+		if (myText.charAt(myText.length - 1) == " ") {
+			// exclude ending space char, if any
 			subst = tagOpen + myText.substring(0, (myText.length - 1)) + tagClose + " ";
 		} else {
 			subst = tagOpen + myText + tagClose;
@@ -94,10 +97,11 @@ function insert_tags(tagOpen, tagClose) {
 			var cPos=startPos+(tagOpen.length+myText.length+tagClose.length);
 			txtarea.selectionStart=cPos;
 			txtarea.selectionEnd=cPos;
-		}else{
+		} else {
 			txtarea.selectionStart=startPos+tagOpen.length;	 
 			txtarea.selectionEnd=startPos+tagOpen.length+myText.length;
 		}
+
 		txtarea.scrollTop=scrollTop;
 	// All others
 	} else {
@@ -112,6 +116,7 @@ function insert_tags(tagOpen, tagClose) {
 		} else {
 			text="";
 		}
+
 		if(!text) { text=sampleText;}
 		text=tagOpen+text+tagClose;
 		//append to the end
@@ -121,8 +126,8 @@ function insert_tags(tagOpen, tagClose) {
 		if(!is_safari) {
 			txtarea.focus();
 		}
-
 	}
+
 	// reposition cursor if possible
 	if (txtarea.createTextRange) txtarea.caretPos = document.selection.createRange().duplicate();
 }
@@ -131,109 +136,95 @@ function insert_tags(tagOpen, tagClose) {
 // Shortcut for smiley adding code
 //
 function insert_smiley(code) {
-	
 	insert_tags(' '+code+' ', '');
-	
 }
 
 //
 // Set focus to input field
 //
 function set_focus(field_id) {
-	
 	document.getElementById(field_id).focus();
-	
 }
 
 //
 // Insert database table name
 //
 function insert_table(name) {
-	
 	insert_tags(name, '');
-	
 }
 
 //
 // Toggle ACP general configuration panels
 //
 function acp_config_toggle(panel) {
-	
-	if ( !document.getElementsByTagName || !panel )
+	if ( !document.getElementsByTagName || !panel ) {
 		return;
-	
-	var panels = document.getElementsByTagName('div');
-	
-	for ( var i = 0; i < panels.length; i++ ) {
-		
-		if ( panels[i].className == 'adminconfigtablecell' )
-			panels[i].style.display = 'none';
-		
 	}
-	
+
+	var panels = document.getElementsByTagName('div');
+
+	for ( var i = 0; i < panels.length; i++ ) {
+		if ( panels[i].className == 'adminconfigtablecell' ) {
+			panels[i].style.display = 'none';
+		}
+	}
+
 	var selected = document.getElementById(panel);
 
-	if ( selected != null )
+	if ( selected != null ) {
 		selected.style.display = 'block';
-	
+	}
 }
 
 function acp_config_onload() {
-
 	var hash = self.document.location.hash.substring(1);
 
-	if ( hash )
+	if ( hash ) {
 		acp_config_toggle(hash);
-	else
+	} else {
 		acp_config_toggle('general');
-
-
+	}
 }
 
 //
 // Standards compliant external windows
 //
 function init_external() {
-	
-	if ( !document.getElementsByTagName )
+	if ( !document.getElementsByTagName ) {
 		return;
-	
-	var anchors = document.getElementsByTagName('a');
-	
-	for ( var i = 0; i < anchors.length; i++ ) {
-		
-		var anchor = anchors[i];
-		if ( anchor.href && anchor.rel && (' '+anchor.rel+' ').indexOf(' external ') != -1 )
-			anchor.target = '_blank';
-		
 	}
-	
+
+	var anchors = document.getElementsByTagName('a');
+
+	for ( var i = 0; i < anchors.length; i++ ) {
+		var anchor = anchors[i];
+
+		if ( anchor.href && anchor.rel && (' '+anchor.rel+' ').indexOf(' external ') != -1 ) {
+			anchor.target = '_blank';
+		}
+	}
 }
 
 //
 // Avatars resize function
 //
 function resize_avatars(allowed_width, allowed_height) {
-	
-	if ( !document.getElementsByTagName )
+	if ( !document.getElementsByTagName ) {
 		return;
-	
-	var avatars = document.getElementsByTagName('img');
-	
-	for ( var i = 0; i < avatars.length; i++ ) {
-		
-		if ( avatars[i].className == 'usebb-avatar' ) {
-			
-			var avatar = avatars[i];
-			
-			if ( allowed_width > 0 && avatar.width > allowed_width )
-				avatar.width = allowed_width;
-			
-			if ( allowed_height > 0 && avatar.height > allowed_height )
-				avatar.height = allowed_height;
-			
-		}
-		
 	}
-	
+
+	var avatars = document.getElementsByTagName('img');
+
+	for ( var i = 0; i < avatars.length; i++ ) {
+		if ( avatars[i].className == 'usebb-avatar' ) {
+			var avatar = avatars[i];
+
+			if ( allowed_width > 0 && avatar.width > allowed_width ) {
+				avatar.width = allowed_width;
+			}
+			if ( allowed_height > 0 && avatar.height > allowed_height ) {
+				avatar.height = allowed_height;
+			}
+		}
+	}
 }

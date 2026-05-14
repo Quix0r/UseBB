@@ -90,5 +90,3 @@ $content .= '<h2>'.$lang['IndexSystemInfo'].'</h2>
 <p id="admincopyright">By the UseBB Project and contributors &mdash; Released under the GNU GPLv2</p>';
 
 $admin_functions->create_body('index', $content);
-
-?>

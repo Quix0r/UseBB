@@ -331,5 +331,3 @@ $templates['anti_spam_question'] = '
 	</table>
 	{form_end}
 ';
-
-?>

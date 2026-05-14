@@ -59,5 +59,3 @@ $templates['topic'] = '
 $templates['footer'] = '
 	</table>
 ';
-
-?>

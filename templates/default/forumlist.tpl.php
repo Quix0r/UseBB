@@ -66,5 +66,3 @@ $templates['cat_footer'] = '
 
 $templates['footer'] = '
 ';
-
-?>

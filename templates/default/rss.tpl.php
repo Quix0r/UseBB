@@ -67,5 +67,3 @@ $templates['footer'] = '
 	</channel>
 </rss>
 ';
-
-?>

@@ -2244,7 +2244,7 @@ class functions {
 		$controls = array_merge($controls, [
 			['[color=red]', '[/color]', $lang['Color'], ''],
 			['[size=14]', '[/size]', $lang['Size'], ''],
-		));
+		]);
 
 		$out = [];
 		foreach ( $controls as $data ) {

@@ -74,13 +74,15 @@ define('USEBB_IS_PROD_ENV', FALSE);
 // Error reporting levels
 //
 $error_level = E_ALL ^ E_NOTICE;
-if ( defined('E_DEPRECATED') )
+if ( defined('E_DEPRECATED') ) {
 	$error_level ^= E_DEPRECATED;
+}
 define('USEBB_PROD_ERROR_LEVEL', $error_level);
 
 $error_level |= E_NOTICE;
-if ( defined('E_DEPRECATED') )
+if ( defined('E_DEPRECATED') ) {
 	$error_level |= E_DEPRECATED;
+}
 define('USEBB_DEV_ERROR_LEVEL', $error_level);
 
 error_reporting(USEBB_IS_PROD_ENV ? USEBB_PROD_ERROR_LEVEL : USEBB_DEV_ERROR_LEVEL);
@@ -98,8 +100,9 @@ ini_set('session.use_trans_sid', '0');
 // Disallow requests that contain some _XYZ global variables
 //
 $request_keys = array_keys($_REQUEST);
-if ( in_array('_GET', $request_keys) || in_array('_POST', $request_keys) || in_array('_COOKIE', $request_keys) || in_array('_FILES', $request_keys) || in_array('_SERVER', $request_keys) || in_array('_ENV', $request_keys) || in_array('_REQUEST', $request_keys) )
+if ( in_array('_GET', $request_keys) || in_array('_POST', $request_keys) || in_array('_COOKIE', $request_keys) || in_array('_FILES', $request_keys) || in_array('_SERVER', $request_keys) || in_array('_ENV', $request_keys) || in_array('_REQUEST', $request_keys) ) {
 	die('Disallowed request variable found. Exited.');
+}
 
 //
 // Unset global variables
@@ -107,12 +110,11 @@ if ( in_array('_GET', $request_keys) || in_array('_POST', $request_keys) || in_a
 // TODO to be removed in PHP 5.4
 //
 if ( ini_get('register_globals') ) {
-	
-	foreach ( $_REQUEST as $var_name => $null )
+	foreach ( $_REQUEST as $var_name => $null ) {
 		unset($$var_name);
-	
+	}
+
 	unset($null);
-	
 }
 
 //
@@ -124,39 +126,37 @@ $_SERVER['PHP_SELF'] = str_replace(array('<', '>'), array('%3C', '%3E'), $_SERVE
 // Fix unavailable $_SERVER['REQUEST_URI'] on IIS
 //
 if ( empty($_SERVER['REQUEST_URI']) ) {
-	
 	$_SERVER['REQUEST_URI'] = $_SERVER['PHP_SELF'];
 	$_SERVER['REQUEST_URI'] .= ( !empty($_SERVER['QUERY_STRING']) ) ? '?'.$_SERVER['QUERY_STRING'] : '';
-	
 }
 
 //
 // Fix unavailable $_SERVER['HTTP_HOST']
 //
 if ( empty($_SERVER['HTTP_HOST']) ) {
-	
 	$_SERVER['HTTP_HOST'] = ( !empty($_SERVER['SERVER_NAME']) ) ? $_SERVER['SERVER_NAME'] : $_SERVER['SERVER_ADDR'];
 	$_SERVER['HTTP_HOST'] .= ( !empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] != 80 ) ? ':'.$_SERVER['SERVER_PORT'] : '';
-	
 }
 
 //
 // Fix some undefined values
 //
-foreach ( array('HTTP_USER_AGENT', 'SERVER_SOFTWARE') as $key )
+foreach ( array('HTTP_USER_AGENT', 'SERVER_SOFTWARE') as $key ) {
 	$_SERVER[$key] = ( !empty($_SERVER[$key]) ) ? $_SERVER[$key] : '';
+}
 
 //
 // Without this, PHP 5.1 might drop a notice
 // UseBB uses its own timezone handling where needed
 //
-if ( function_exists('date_default_timezone_set') )
+if ( function_exists('date_default_timezone_set') ) {
 	date_default_timezone_set('UTC');
+}
 
 //
 // Include functions.php
 //
-require(ROOT_PATH.'sources/functions.php');
+require ROOT_PATH.'sources/functions.php';
 $functions = new functions;
 
 //
@@ -176,17 +176,19 @@ set_error_handler(array(&$functions, 'usebb_die'));
 //
 // Check for install/ on production environment.
 //
-if ( USEBB_IS_PROD_ENV && !defined('IS_INSTALLER') && file_exists(ROOT_PATH.'install') )
-	trigger_error('The directory \'install\' must be removed after installation to access this forum.', E_USER_ERROR);
+if ( USEBB_IS_PROD_ENV && !defined('IS_INSTALLER') && file_exists(ROOT_PATH.'install') ) {
+	trigger_error('The directory \'install\' must be removed after installation to access this forum.');
+}
 
 //
 // Include config.php
 //
 $config_file = ROOT_PATH.'config.php';
-if ( file_exists($config_file) )
-	require($config_file);
-else
-	trigger_error('config.php does not exist!', E_USER_ERROR);
+if ( file_exists($config_file) ) {
+	require $config_file;
+} else {
+	trigger_error('config.php does not exist!');
+}
 
 //
 // Define some constants
@@ -309,15 +311,16 @@ define('GA_MULTIPLE_DOMAINS', 2);
 // If logging hidden errors is enabled, reset error reporting to dev environment.
 // usebb_die will now catch these, log them and further ignore them.
 //
-if ( $functions->get_config('error_log_log_hidden') && USEBB_IS_PROD_ENV )
+if ( $functions->get_config('error_log_log_hidden') && USEBB_IS_PROD_ENV ) {
 	error_reporting(USEBB_DEV_ERROR_LEVEL);
+}
 
 //
 // Include all other necessary files
 //
-require(ROOT_PATH.'sources/template.php');
+require ROOT_PATH.'sources/template.php';
 $template = new template;
-require(ROOT_PATH.'sources/session.php');
+require ROOT_PATH.'sources/session.php';
 $session = new session;
 
 //
@@ -326,7 +329,7 @@ $session = new session;
 $db_class_file = ROOT_PATH.'sources/db_'.$dbs['type'].'.php';
 
 if ( !file_exists($db_class_file) || !is_readable($db_class_file) )
-	trigger_error('Unable to load module for database server "'.$dbs['type'].'"!', E_USER_ERROR);
+	trigger_error('Unable to load module for database server "'.$dbs['type'].'"!');
 
 require($db_class_file);
 $db = new db;

@@ -76,5 +76,3 @@ $templates['footer'] = '
 	<p id="pagelinksbottom">{page_links}</p>
 	<div id="bottomfix"></div>
 ';
-
-?>

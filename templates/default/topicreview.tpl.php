@@ -68,5 +68,3 @@ $templates['footer'] = '
 		</tr>
 	</table>
 ';
-
-?>
