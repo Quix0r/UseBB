@@ -204,9 +204,9 @@ if ( !$functions->get_stats('forums') ) {
 					
 				}
 				
-				list($forum_icon, $forum_status) = $functions->forum_icon($forumdata['id'], $forumdata['status'], $forumdata['post_time']);
+				list($forum_icon, $forum_status) = $functions->forum_icon($forumdata['id'], $forumdata['status']);
 				
-				$template->parse('forum', 'forumlist', array(
+				$template->parse('forum', 'forumlist', [
 					'forum_icon' => $forum_icon,
 					'forum_status' => $forum_status,
 					'forum_name' => '<a href="'.$functions->make_url('forum.php', array('id' => $forumdata['id'])).'">'.unhtml(stripslashes($forumdata['name'])).'</a>',
@@ -220,7 +220,7 @@ if ( !$functions->get_stats('forums') ) {
 					'lp_author' => ( $forumdata['topics'] ) ? $author : '-',
 					'lp_date' => ( $forumdata['topics'] ) ? $functions->make_date($forumdata['post_time']) : '-',
 					'latest_post' => ( $forumdata['topics'] ) ? '<a href="'.$functions->make_url('topic.php', array('post' => $forumdata['last_post_id'])).'#post'.$forumdata['last_post_id'].'"'.$last_topic_title_full.' rel="nofollow">'.$last_topic_title.'</a>' : $lang['NoPosts']
-				));
+				]);
 				
 			}
 			

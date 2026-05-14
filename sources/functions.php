@@ -2528,10 +2528,9 @@ class functions {
 	 *
 	 * @param int $id Forum ID
 	 * @param bool $open Open (or locked)
-	 * @param int $post_time Unix timestamp of update
 	 * @return array Array with forum icon and status
 	 */
-	public function forum_icon(int $id, bool $open, int $post_time): array {
+	public function forum_icon(int $id, bool $open): array {
 		global $db, $session, $template, $lang;
 
 		if ( $session->sess_info['user_id'] && !empty($_SESSION['previous_visit']) && !is_array($this->updated_forums) ) {
@@ -2564,7 +2563,7 @@ class functions {
 			}
 		}
 
-		return array($forum_icon, $forum_status);
+		return [$forum_icon, $forum_status];
 	}
 
 	/**
