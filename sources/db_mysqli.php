@@ -136,7 +136,7 @@ class db {
 	 * @param resource $result SQL query resource
 	 * @return array Array containing one result
 	 */
-	function fetch_result(&$result): array {
+	function fetch_result(&$result): array|null {
 		$res_array = mysqli_fetch_array($result, MYSQLI_ASSOC);
 
 		if ( is_array($res_array) ) {
