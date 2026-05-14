@@ -66,8 +66,6 @@ class db {
 	private $queries = [];
 	private $persistent;
 
-	/**#@-*/
-	
 	/**
 	 * Make a connection to the MySQL server
 	 *
@@ -76,7 +74,7 @@ class db {
 	function connect(array $config): void {
 		global $functions;
 
-		if ( defined('NO_DB') {
+		if ( defined('NO_DB') ) {
 			return;
 		}
 
